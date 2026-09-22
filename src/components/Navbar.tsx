@@ -52,8 +52,12 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, setCurrentView }) =
               <Kanban className="w-6 h-6 stroke-[2.5]" />
             </div>
             <div className="text-left">
-              <span className="font-black tracking-widest uppercase text-base block">JIRA_RAW</span>
-              <span className="text-[9px] text-orange-400 tracking-tighter block -mt-1 font-bold">USB AGILE CORE</span>
+              <span className="font-black tracking-wider uppercase text-xs sm:text-sm block text-yellow-400">
+                Board Academico USB-FI-IS-IS2-V3
+              </span>
+              <span className="text-[9px] text-neutral-300 tracking-tighter block -mt-0.5 font-bold">
+                USB AGILE CORE · SIMULACIÓN & METODOLOGÍAS
+              </span>
             </div>
           </button>
 

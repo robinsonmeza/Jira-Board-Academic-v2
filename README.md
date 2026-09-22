@@ -1,6 +1,7 @@
-# Jira Board Clone - Documentación Técnica y Funcional
+# Board Academico USB-FI-IS-IS2-V3 - Documentación Técnica y Funcional
 
-> **Versión**: 3.4.0  
+> **Subtítulo Oficial**: BOARD DE SIMULACION DE PROYECTOS DE DESARROLLO Y APLICACION DE METODOLGIAS AGILES.  
+> **Versión**: 3.5.0  
 > **Estado**: Producción / Desplegado en Vercel & Firebase Cloud Firestore  
 > **Autor Principal / Project Manager**: Robinson Meza (`RobinsonAmeza@gmail.com`)  
 > **Estilo de Diseño**: Brutalismo Industrial (Industrial Brutalist UI System)  
@@ -70,10 +71,22 @@ El nuevo lenguaje visual abandona gradientes decorativos y sombras difusas gené
 - **KPIs Globales**: Proyectos activos, Sprints en curso, Tareas completadas y Porcentaje global de avance.
 - **Desglose de Carga de Trabajo**: Distribución de tareas por responsable dentro del equipo, historial de actividad reciente y detalle de cada Sprint.
 
-### 3.5 Reportes y Métricas Ágiles (`ReportsView.tsx`)
-- **Burndown Chart de Sprint**: Línea ideal de quema de Story Points vs. línea de progreso real por día del sprint.
-- **Velocidad de Sprints**: Comparativa de Story Points planificados vs. puntos entregados entre diferentes iteraciones.
-- **Distribución de Trabajo**: Métricas por estado, tipo de incidencia y prioridad.
+### 3.5 Métricas de Proyecto y Productividad de Desarrolladores (`MetricsView.tsx`)
+- **Gráfico de Avance por Sprint (Recharts)**:
+  - Comparación gráfica directa de **Tareas Completadas vs Total de Tareas por Sprint** con barras agrupadas y línea de porcentaje de avance (`% de Tasa de Avance`).
+- **Filtro Integral por Desarrollador**:
+  - Selector individual de desarrolladores con tarjetas de perfil, roles ([Frontend], [Backend]), avatar y buscador dinámico.
+  - Al seleccionar un desarrollador, **todas las estadísticas medibles del proyecto se recalculan dinámicamente** para reflejar exclusivamente la productividad, entregas y tareas de dicho dev.
+- **Gráfico de Puntos de Historia (Velocidad)**:
+  - Story Points comprometidos vs entregados por cada iteración.
+- **Distribución de Carga de Trabajo del Equipo**:
+  - Comparativa de tareas completadas, en progreso y pendientes entre todos los integrantes.
+- **Métricas Multidimensionales del Proyecto**:
+  - Distribución por Estado del Pipeline (Donut Recharts).
+  - Distribución por Tipo de Incidencia (Historias de Usuario, Tareas Dev, Bugs/QA, Epics).
+  - Distribución por Nivel de Prioridad y Cumplimiento de Criterios BDD.
+- **Tabla Técnica de Tareas Asignadas**:
+  - Desglose con claves, estados, puntos y botón de inspección directa.
 
 ### 3.6 Modal Integral de Tarea (`TaskModal.tsx`)
 - **Pestañas Técnicas**:
@@ -86,7 +99,32 @@ El nuevo lenguaje visual abandona gradientes decorativos y sombras difusas gené
   - Botón **"Auditar con IA (QA)"**: Ejecuta análisis técnico automático sobre INVEST y BDD.
   - Botón **"Generar HU con IA"**: Convierte un enunciado breve en una Historia de Usuario canónica estructurada.
 
-### 3.7 Administración de Usuarios e Importación CSV (`ManageUsersModal.tsx` & `CsvImportModal.tsx`)
+### 3.7 Planning Poker Colaborativo (`PlanningPokerModal.tsx`)
+- **Baraja Fibonacci Completa**: 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100, ?, ☕.
+- **Mesa de Votación Oculta**: Votos tapados hasta la revelación sincronizada.
+- **Consenso y Alerta de Divergencia**: Cálculo del promedio de Story Points y sugerencia automática de Fibonacci.
+- **Asignación en un Clic**: Aplica los puntos acordados directamente a la tarea seleccionada en la base de datos.
+
+### 3.8 Tablero de Retrospectiva de Sprint (`RetrospectiveView.tsx`)
+- **3 Columnas Canónicas de Inspección y Adaptación**:
+  - *¿Qué funcionó bien?* (Green)
+  - *¿Qué podemos mejorar?* (Amber)
+  - *Acciones de mejora del próximo Sprint* (Cyan)
+- **Control de Acceso Basado en Roles (RBAC Estricto)**:
+  - **Product Owner y Project Manager (Modo Edición)**: Permisos exclusivos para redactar nuevas reflexiones, eliminar tarjetas y comprometer acciones convirtiéndolas directamente en tareas de Backlog en Firestore.
+  - **Frontend, Backend y QA (Modo Consulta y Votación)**: Pueden inspeccionar todo el tablero y participar democráticamente votando `[+1]` por las reflexiones más críticas para priorizar acuerdos de equipo sin alterar el contenido editorial.
+- **Sin Datos Ficticios**: Inicia en estado completamente limpio y listo para registrar las reflexiones reales de los estudiantes e instructores.
+- **Conversión Directa a Tarea de Backlog**: Convierte cualquier acción de mejora comprometida en una tarea real en el Backlog del proyecto con un solo clic.
+- **Acta Exportable**: Copia el resumen formateado del acta de la retrospectiva al portapapeles.
+
+### 3.9 Facilitador de Daily Scrum Standup (`DailyScrumModal.tsx`)
+- **Sincronización Estilo DailyToast.io**: Ronda de oradores con temporizador dinámico (60s - 180s) y barra de progreso.
+- **Filtro Estricto de Integrantes**: Carga automática de los miembros asignados al proyecto; permite marcar ausentes.
+- **Efectos Sonoros Mecánicos**: Tictac y campanilla sintetizados mediante Web Audio API.
+- **3 Preguntas Canónicas**: ¿Qué hice ayer?, ¿Qué haré hoy?, ¿Tengo bloqueos?
+- **Resumen Copiable**: Resumen de tiempos y bloqueos listo para exportar.
+
+### 3.10 Administración de Usuarios e Importación CSV (`ManageUsersModal.tsx` & `CsvImportModal.tsx`)
 - Módulo reservado para el **Project Manager (Admin)**.
 - Creación y edición individual de usuarios con asignación de roles y contraseña.
 - **Importación Masiva vía CSV**:
@@ -185,16 +223,20 @@ A partir de la versión 3.0.0, el modelo de datos utiliza colecciones independie
 │       ├── BacklogView.tsx         # Gestión de Backlog y asignación rápida a Sprints
 │       ├── BoardView.tsx           # Tablero Kanban principal con columnas industriales
 │       ├── CsvImportModal.tsx      # Modal de importación masiva de usuarios CSV
+│       ├── DailyScrumModal.tsx     # Facilitador de Daily Standup estilo DailyToast
 │       ├── EditUserModal.tsx       # Edición de credenciales y perfiles de usuario
 │       ├── FilterBar.tsx           # Barra de búsqueda y filtros rápidos
 │       ├── LoginView.tsx           # Pantalla de autenticación en Brutalismo Industrial
 │       ├── ManageUsersModal.tsx    # Consola de administración de usuarios (PM)
 │       ├── MemberModals.tsx        # Consulta y gestión de miembros de proyecto
+│       ├── MetricsView.tsx         # Métricas de avance Recharts, productividad y filtro por dev
 │       ├── Navbar.tsx              # Barra de navegación técnica superior
+│       ├── PlanningPokerModal.tsx  # Estimación colaborativa Fibonacci y consenso de puntos
 │       ├── ProjectDashboardView.tsx# Dashboard ejecutivo y métricas consolidadas
 │       ├── ProjectModals.tsx       # Modales de creación y edición de proyectos
 │       ├── ProjectsView.tsx        # Vista general de tarjetas de proyectos
 │       ├── ReportsView.tsx         # Gráficas de Burndown, velocidad y distribución
+│       ├── RetrospectiveView.tsx   # Tablero ágil de retrospectiva y mejora continua
 │       ├── SprintBar.tsx           # Barra de estado y progreso del Sprint activo
 │       ├── SprintModal.tsx         # Modal de planificación y lanzamiento de Sprints
 │       ├── TaskCard.tsx            # Tarjeta de tarea Kanban de alto contraste

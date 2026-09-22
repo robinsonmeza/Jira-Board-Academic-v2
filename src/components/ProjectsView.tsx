@@ -94,9 +94,9 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenBoard }) => {
           </div>
           <p className="text-xs font-bold text-neutral-600 mt-1 uppercase">
             {isPM
-              ? 'SUPERVISIÓN GLOBAL DE RENDIMIENTO, SPRINTS Y CARGA DE TRABAJO.'
+              ? 'BOARD DE SIMULACION DE PROYECTOS DE DESARROLLO Y APLICACION DE METODOLGIAS AGILES.'
               : isPO
-              ? 'GESTIÓN INTEGRAL DE PROYECTOS, SPRINTS Y CAPACIDAD TÉCNICA.'
+              ? 'BOARD DE SIMULACION DE PROYECTOS DE DESARROLLO Y APLICACION DE METODOLGIAS AGILES.'
               : `ROL OPERATIVO: ${ROLE_LABELS[currentUser?.role || 'frontend'].toUpperCase()}.`}
           </p>
         </div>

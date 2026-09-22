@@ -14,12 +14,17 @@ import {
   Lock,
   Layers,
   Sparkles,
+  RotateCcw,
 } from 'lucide-react';
 import { TaskCard } from './TaskCard';
 import { SprintBar } from './SprintBar';
 import { FilterBar } from './FilterBar';
 import { BacklogView } from './BacklogView';
 import { ReportsView } from './ReportsView';
+import { MetricsView } from './MetricsView';
+import { RetrospectiveView } from './RetrospectiveView';
+import { DailyScrumModal } from './DailyScrumModal';
+import { PlanningPokerModal } from './PlanningPokerModal';
 import { TaskModal } from './TaskModal';
 import { SprintModal } from './SprintModal';
 import { MembersModal } from './MemberModals';
@@ -41,8 +46,8 @@ export const BoardView: React.FC<BoardViewProps> = ({ onBackToProjects }) => {
     deleteColumn,
   } = useJira();
 
-  // Active View Tab: 'board' | 'backlog' | 'reports'
-  const [activeTab, setActiveTab] = useState<'board' | 'backlog' | 'reports'>('board');
+  // Active View Tab: 'board' | 'backlog' | 'reports' | 'retro'
+  const [activeTab, setActiveTab] = useState<'board' | 'backlog' | 'reports' | 'retro'>('board');
 
   // Filters State
   const [search, setSearch] = useState('');
@@ -60,6 +65,8 @@ export const BoardView: React.FC<BoardViewProps> = ({ onBackToProjects }) => {
   const [targetColumnId, setTargetColumnId] = useState<number | null>(null);
   const [isSprintModalOpen, setIsSprintModalOpen] = useState(false);
   const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
+  const [isDailyScrumOpen, setIsDailyScrumOpen] = useState(false);
+  const [isPlanningPokerOpen, setIsPlanningPokerOpen] = useState(false);
   const [isAddColumnModalOpen, setIsAddColumnModalOpen] = useState(false);
   const [newColName, setNewColName] = useState('');
   const [newColColor, setNewColColor] = useState('#C3CFE2');
@@ -258,7 +265,37 @@ export const BoardView: React.FC<BoardViewProps> = ({ onBackToProjects }) => {
               <BarChart3 className="w-3.5 h-3.5" />
               <span>MÉTRICAS</span>
             </button>
+
+            <button
+              onClick={() => setActiveTab('retro')}
+              className={`px-3 py-1.5 flex items-center gap-1.5 uppercase transition-all cursor-pointer ${
+                activeTab === 'retro'
+                  ? 'bg-yellow-400 text-black border border-black font-black'
+                  : 'text-neutral-700 hover:text-black hover:bg-neutral-100'
+              }`}
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>RETROSPECTIVA</span>
+            </button>
           </div>
+
+          <button
+            onClick={() => setIsDailyScrumOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-yellow-400 hover:bg-yellow-300 text-black border-2 border-black text-xs font-black uppercase brutal-shadow-sm brutal-btn cursor-pointer"
+            title="Iniciar sesión de Daily Scrum Standup (Estilo DailyToast)"
+          >
+            <span className="text-base leading-none">🍞</span>
+            <span>DAILY SCRUM</span>
+          </button>
+
+          <button
+            onClick={() => setIsPlanningPokerOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-orange-400 hover:bg-orange-300 text-black border-2 border-black text-xs font-black uppercase brutal-shadow-sm brutal-btn cursor-pointer"
+            title="Iniciar sesión de Planning Poker Fibonacci"
+          >
+            <span className="text-base leading-none">🃏</span>
+            <span>PLANNING POKER</span>
+          </button>
 
           <button
             onClick={() => setIsMembersModalOpen(true)}
@@ -272,26 +309,29 @@ export const BoardView: React.FC<BoardViewProps> = ({ onBackToProjects }) => {
 
       {/* Main Content Area */}
       <div className="mt-5">
-        {/* Sprint Bar */}
-        <SprintBar
-          selectedSprintId={selectedSprintId}
-          setSelectedSprintId={setSelectedSprintId}
-          onOpenCreateSprint={() => setIsSprintModalOpen(true)}
-        />
+        {/* Sprint Bar & Filter Bar (Board and Backlog views) */}
+        {(activeTab === 'board' || activeTab === 'backlog') && (
+          <>
+            <SprintBar
+              selectedSprintId={selectedSprintId}
+              setSelectedSprintId={setSelectedSprintId}
+              onOpenCreateSprint={() => setIsSprintModalOpen(true)}
+            />
 
-        {/* Filter Bar */}
-        <FilterBar
-          search={search}
-          setSearch={setSearch}
-          typeFilter={typeFilter}
-          setTypeFilter={setTypeFilter}
-          priorityFilter={priorityFilter}
-          setPriorityFilter={setPriorityFilter}
-          assigneeFilter={assigneeFilter}
-          setAssigneeFilter={setAssigneeFilter}
-          labelFilter={labelFilter}
-          setLabelFilter={setLabelFilter}
-        />
+            <FilterBar
+              search={search}
+              setSearch={setSearch}
+              typeFilter={typeFilter}
+              setTypeFilter={setTypeFilter}
+              priorityFilter={priorityFilter}
+              setPriorityFilter={setPriorityFilter}
+              assigneeFilter={assigneeFilter}
+              setAssigneeFilter={setAssigneeFilter}
+              labelFilter={labelFilter}
+              setLabelFilter={setLabelFilter}
+            />
+          </>
+        )}
 
         {/* 1. Board View (Kanban) */}
         {activeTab === 'board' && (
@@ -433,8 +473,11 @@ export const BoardView: React.FC<BoardViewProps> = ({ onBackToProjects }) => {
           <BacklogView onOpenTaskModal={handleOpenCreateTask} tasksList={filteredTasks} />
         )}
 
-        {/* 3. Reports View */}
-        {activeTab === 'reports' && <ReportsView />}
+        {/* 3. Metrics View (Productivity & Stats) */}
+        {activeTab === 'reports' && <MetricsView onOpenTaskModal={handleOpenEditTask} />}
+
+        {/* 4. Sprint Retrospective View */}
+        {activeTab === 'retro' && <RetrospectiveView />}
       </div>
 
       {/* Task Creation & Detail Modal */}
@@ -450,6 +493,15 @@ export const BoardView: React.FC<BoardViewProps> = ({ onBackToProjects }) => {
 
       {/* Members Modal */}
       <MembersModal isOpen={isMembersModalOpen} onClose={() => setIsMembersModalOpen(false)} />
+
+      {/* Daily Scrum Standup Modal (DailyToast Style) */}
+      <DailyScrumModal isOpen={isDailyScrumOpen} onClose={() => setIsDailyScrumOpen(false)} />
+
+      {/* Planning Poker Modal */}
+      <PlanningPokerModal
+        isOpen={isPlanningPokerOpen}
+        onClose={() => setIsPlanningPokerOpen(false)}
+      />
 
       {/* Add Column Modal */}
       {isAddColumnModalOpen && (

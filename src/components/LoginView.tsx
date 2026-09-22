@@ -40,7 +40,9 @@ export const LoginView: React.FC = () => {
         <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-500 border-4 border-black brutal-shadow mb-4 text-black">
           <Kanban className="w-10 h-10 stroke-[2.5]" />
         </div>
-        <h1 className="text-3xl font-black text-black tracking-widest uppercase">JIRA_RAW v2.0</h1>
+        <h1 className="text-xl sm:text-2xl font-black text-black tracking-wider uppercase">
+          Board Academico USB-FI-IS-IS2-V3
+        </h1>
         <div className="inline-block bg-black text-yellow-400 text-xs font-black px-2 py-0.5 mt-1 border border-black">
           SISTEMA GESTIÓN METODOLOGÍAS ÁGILES USB
         </div>
