@@ -399,7 +399,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               }`}
             >
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Auditoría QA (NVIDIA AI)</span>
+              <span>Auditoría QA (Bedrock / NVIDIA)</span>
             </button>
           </div>
         )}
@@ -991,7 +991,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
             </div>
           )}
 
-          {/* Option 2: QA Audit Tab with NVIDIA NIM (Llama 3.3 70B) */}
+          {/* Option 2: QA Audit Tab with Amazon Bedrock (Primary) & NVIDIA NIM (Secondary) */}
           {activeTab === 'audit' && (
             <div className="space-y-4">
               <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-4 flex items-start justify-between gap-4">
@@ -1004,7 +1004,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                       <h4 className="text-sm font-bold text-emerald-950">Auditoría Técnica y Pedagógica de Calidad</h4>
                       <span className="bg-emerald-200/80 text-emerald-900 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                         <Cpu className="w-3 h-3 text-emerald-700" />
-                        NVIDIA NIM (Llama 3.3 70B)
+                        Bedrock Primaria + NVIDIA NIM
                       </span>
                     </div>
                     <p className="text-xs text-emerald-800 mt-0.5 leading-relaxed">
@@ -1036,7 +1036,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                   <div className="inline-flex p-3 rounded-full bg-emerald-50 text-emerald-600 animate-pulse">
                     <Sparkles className="w-6 h-6 animate-spin" />
                   </div>
-                  <p className="text-xs font-medium text-slate-700">Analizando requerimientos técnicos y criterios de aceptación con NVIDIA Llama 3.3 70B...</p>
+                  <p className="text-xs font-medium text-slate-700">Analizando requerimientos técnicos y criterios de aceptación con Amazon Bedrock & NVIDIA NIM...</p>
                   <p className="text-[11px] text-slate-400">Verificando principio INVEST y completitud de entrega.</p>
                 </div>
               )}
@@ -1048,7 +1048,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                       <FileCheck className="w-4 h-4 text-emerald-600" />
                       <span>Informe de Evaluación Académica de la Tarea</span>
                     </div>
-                    <span className="text-[10px] text-slate-400">Generado con aceleración GPU NVIDIA</span>
+                    <span className="text-[10px] text-slate-400">Motor IA: Amazon Bedrock (Primaria) / NVIDIA NIM (Secundaria)</span>
                   </div>
 
                   <div className="text-xs leading-relaxed text-slate-700 whitespace-pre-wrap font-normal">

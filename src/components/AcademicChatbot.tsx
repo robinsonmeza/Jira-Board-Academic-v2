@@ -261,8 +261,8 @@ Puedes hacerme cualquier pregunta o seleccionar una de las sugerencias rápidas 
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm font-bold text-white tracking-tight">ScrumBot Tutor</h3>
-                  <span className="bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 text-[10px] font-semibold px-1.5 py-0.2 rounded-sm">
-                    IA Académica
+                  <span className="bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 text-[10px] font-semibold px-1.5 py-0.2 rounded-sm" title="Motor Primario: Amazon Bedrock | Motor Secundario: NVIDIA NIM">
+                    Bedrock + NVIDIA
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-400 flex items-center gap-1.5">

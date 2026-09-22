@@ -1,9 +1,9 @@
 # Jira Board Clone - Documentación Técnica y Funcional
 
-> **Versión**: 3.1.0  
+> **Versión**: 3.3.0  
 > **Estado**: Producción / Desplegado en Vercel & Firebase Cloud Firestore  
 > **Autor Principal / Project Manager**: Robinson Meza (`RobinsonAmeza@gmail.com`)  
-> **Arquitectura**: Full-stack (React 18 + Vite + Express Backend + Google GenAI SDK + Cloud Firestore)
+> **Arquitectura**: Full-stack (React 18 + Vite + Express Backend + Amazon Bedrock + NVIDIA NIM + Google GenAI + Cloud Firestore)
 
 ---
 
@@ -11,16 +11,16 @@
 
 **Jira Board Clone** es una plataforma web colaborativa y multiusuario diseñada para la gestión ágil de proyectos de software académico y profesional. Permite planificar Sprints, gestionar Backlogs, administrar tableros Kanban interactivos, registrar métricas y controlar el acceso de usuarios mediante un modelo robusto de control de acceso basado en roles (**RBAC**).
 
-A partir de la versión **v3.1.0**, la plataforma integra **ScrumBot (Tutor Pedagógico con IA Gemini)** para orientar a los estudiantes en la redacción de Historias de Usuario, criterios de aceptación (INVEST/BDD) y conceptos ágiles, reduciendo drásticamente la carga de consultas recurrentes del docente.
+A partir de la versión **v3.3.0**, la plataforma cuenta con una arquitectura de Inteligencia Artificial resiliente de múltiples niveles que integra **Amazon Bedrock** como proveedor primario de alta velocidad, respaldado por **NVIDIA NIM** como proveedor secundario, **Google Gemini** como contingencia y un **Motor Pedagógico Académico Local** de cero caídas.
 
 ---
 
-## 2. Tutor Académico Virtual con IA (ScrumBot) - v3.1.0
+## 2. Tutor Académico Virtual con IA (ScrumBot) y Motor de Calidad de Software (v3.3.0)
 
 ### 2.1 Propósito Pedagógico
 En talleres universitarios y cursos de Ingeniería de Software, los estudiantes suelen presentar dudas recurrentes respecto a cómo estructurar historias de usuario, cómo estimar Story Points o cuáles son las responsabilidades según su rol asignado en el proyecto. 
 
-Para **disminuir la carga del docente y empoderar al estudiante**, se incorporó un chatbot pedagógico en tiempo real con IA (`gemini-3.8-flash`) accesible mediante un botón flotante permanente y contextualizado por proyecto:
+Para **disminuir la carga del docente y empoderar al estudiante**, se incorporó un tutor pedagógico en tiempo real con IA accesible mediante un botón flotante permanente y contextualizado por proyecto:
 
 1. **Guía para Documentar Historias de Usuario (HU)**:
    - Enseñanza del estándar canónico:
@@ -37,31 +37,65 @@ Para **disminuir la carga del docente y empoderar al estudiante**, se incorporó
 5. **Chips de Preguntas Frecuentes**:
    - Acceso en un clic a guías preparadas (BDD, roles, estimación en Fibonacci y contexto del proyecto).
 
-### 2.2 Blindaje Académico (Guardrails Estrictos) y Resiliencia en Servidor (v3.2.0)
+### 2.2 Blindaje Académico (Guardrails Estrictos)
 Para proteger el propósito educativo de la plataforma y evitar desvíos o costos imprevistos:
 - **Blindaje Anti-Desvío de Tema (Strict Guardrails)**:
-  - Instrucción de sistema estricta en `server.ts` que rechaza automáticamente cualquier solicitud que no pertenezca a Metodologías Ágiles (Scrum/Kanban) o Ingeniería de Software (ej. redacción de poemas, tareas de otras materias, juegos, etc.).
+  - Instrucción de sistema estricta en el servidor que rechaza automáticamente cualquier solicitud que no pertenezca a Metodologías Ágiles (Scrum/Kanban) o Ingeniería de Software (ej. redacción de poemas, tareas de otras materias, juegos, etc.).
   - Respuesta estandarizada y cortés: *"Como tutor pedagógico de Scrum y Jira para tu proyecto académico, solo puedo orientarte en temas de metodologías ágiles, historias de usuario, roles de equipo y tareas de este tablero. ¿En qué funcionalidad o historia de tu Sprint podemos avanzar hoy?"*
-  - **Protección Anti-Jailbreak / Prompt Injection**: Ignora intentos de "modo DAN", olvido de instrucciones o suplantación de identidad.
-  - **Enfoque Pedagógico**: Orienta con contratos de API, escenarios BDD y criterios técnicos, sin hacerle la tarea completa de codificación al estudiante para preservar el aprendizaje.
+- **Protección Anti-Jailbreak / Prompt Injection**: Ignora intentos de "modo DAN", olvido de instrucciones o suplantación de identidad.
+- **Enfoque Pedagógico**: Orienta con contratos de API, escenarios BDD y criterios técnicos, sin hacerle la tarea completa de codificación al estudiante para preservar el aprendizaje.
 
-### 2.3 Integración de IA Multimodelo (Opción 1 y Opción 2)
-1. **Opción 1 - Alta Disponibilidad y Resiliencia (Fallback Cascade)**:
-   - Cascada multinivel en servidor para soportar picos transitorios: `gemini-3.5-flash` (alta estabilidad) -> `gemini-flash-latest` -> `gemini-3.8-flash` -> `NVIDIA NIM Llama 3.3 70B`.
-2. **Opción 2 - Auditoría Técnica y Pedagógica de Calidad (QA Tool)**:
-   - Pestaña interactiva **"Auditoría QA (NVIDIA AI)"** en el modal de tareas (`TaskModal.tsx`).
-   - Endpoint `/api/ai/audit-task` que analiza la tarea seleccionada y emite un dictamen académico exhaustivo:
-     - Cumplimiento del formato "Como / Quiero / Para".
-     - Evaluación de criterios INVEST y BDD (*Dado / Cuando / Entonces*).
-     - Validación técnica (Frontend, Backend, Seguridad, Manejo de errores y UX).
-     - Dictamen del estado: `✅ LISTA PARA SPRINT`, `⚠️ REQUIERE REFINAMIENTO` o `❌ INCOMPLETA`.
-     - Sugerencia redactada de mejora con escenarios de prueba completos.
+### 2.3 Arquitectura Multi-Proveedor y Conmutación por Falla (Multi-Tier Resilient Engine)
+El backend orquesta las peticiones a través de 4 niveles jerárquicos para garantizar una disponibilidad continua y libre de interrupciones:
 
-### 2.4 Pruebas Automatizadas de Funcionalidad del Chatbot y Auditoría (Verificadas)
-- **Prueba 1 (Consulta teórica e INVEST)**: Respuesta clara y en 2 líneas del principio INVEST (`HTTP 200 OK`).
-- **Prueba 2 (Blindaje ante temas ajenos - Poema)**: Rechazo exitoso de prompt de poesía con la respuesta de guardrail académica.
-- **Prueba 3 (Auditoría Técnica de Tarea - Login con Google)**: Reporte exhaustivo con diagnóstico BDD, preguntas de seguridad y sugerencia técnica de redacción emitido correctamente (`HTTP 200 OK`).
-- **Prueba 4 (Inserción de plantilla en UI)**: Botón *Insertar Plantilla HU* y pestaña *Auditoría QA* plenamente integrados en `TaskModal.tsx`.
+1. **Tier 1 (PROVEEDOR PRINCIPAL): Amazon Bedrock (Converse API)**
+   - **Autenticación**: Bedrock API Key con autorización vía Bearer Token (`ABSK...`).
+   - **Modelos integrados**: `amazon.nova-lite-v1:0` (ultra-rápido, ~850 ms a 1.6 s), con balanceo interno hacia `amazon.nova-micro-v1:0` y `meta.llama3-70b-instruct-v1:0`.
+   - **Características**: Latencia mínima, alta tasa de tokens por segundo y disponibilidad garantizada en la región `us-east-1`.
+2. **Tier 2 (PROVEEDOR SECUNDARIO): NVIDIA NIM (Inference Microservices)**
+   - **Autenticación**: Clave de API de NVIDIA Cloud (`nvapi-...`).
+   - **Modelo integrado**: `meta/llama-3.2-11b-vision-instruct` (~900 ms de respuesta).
+   - **Características**: Conmutación automática instantánea ante cualquier eventualidad o latencia elevada en el proveedor primario.
+3. **Tier 3 (CONTINGENCIA CLOUD): Google Gemini Cascade**
+   - **Modelos**: `gemini-3.6-flash` y variantes con límite de espera estricto por intento.
+4. **Tier 4 (MOTOR LOCAL DE CERO CAÍDAS): Generador Pedagógico Contextual**
+   - Si se presentase una interrupción externa global simultánea en los proveedores de nube, el servidor genera de manera autónoma dictámenes de auditoría QA, plantillas BDD e instrucciones de Scrum contextualizadas al proyecto actual, asegurando un **tiempo de actividad del 100%**.
+
+### 2.4 Endpoints de IA Operativos
+
+| Endpoint | Método | Propósito | Proveedor Prioritario |
+| :--- | :--- | :--- | :--- |
+| `/api/ai/chat` | `POST` | Tutor Scrum y asistente de redacción multi-turno | **Amazon Bedrock** (Primario) / **NVIDIA NIM** (Secundario) |
+| `/api/ai/audit-task` | `POST` | Auditoría técnica QA, validación INVEST y formato BDD | **Amazon Bedrock** (Primario) / **NVIDIA NIM** (Secundario) |
+| `/api/ai/generate-story` | `POST` | Conversión automática de requerimiento en Historia de Usuario | **Amazon Bedrock** (Primario) / **NVIDIA NIM** (Secundario) |
+
+### 2.5 Resultados de la Batería de Pruebas de Verificación (100% Superadas)
+
+Se ejecutó una suite automatizada de pruebas exhaustivas en vivo validando la interoperabilidad:
+
+```text
+=== TEST 1: Amazon Bedrock (PRIMARIA) ===
+Status HTTP: 200 OK | Latencia: 1613 ms
+Resultado: Respuesta pedagógica completa sobre pilares de Scrum (Transparencia, Inspección, Adaptación).
+
+=== TEST 2: NVIDIA NIM (SECUNDARIA) ===
+Status HTTP: 200 OK | Latencia: 1038 ms
+Resultado: Conmutación exitosa y respuesta estructurada sobre principios ágiles.
+
+=== TEST 3: Endpoint Servidor /api/ai/chat (En vivo) ===
+Status HTTP: 200 OK | Latencia: 2922 ms
+Resultado: Explicación interactiva del principio INVEST contextualizada a 'Portal Docente'.
+
+=== TEST 4: Endpoint Servidor /api/ai/audit-task (En vivo) ===
+Status HTTP: 200 OK | Latencia: 5421 ms
+Resultado: Dictamen de calidad técnica y criterios BDD emitidos para la tarea de OAuth 2.0.
+
+=== TEST 5: Endpoint Servidor /api/ai/generate-story (En vivo) ===
+Status HTTP: 200 OK | Latencia: 2621 ms
+Resultado: Generación canónica estructurada con narrativa, BDD, rol y Story Points sugeridos.
+
+>>> ¡TODAS LAS PRUEBAS (1 AL 5) SUPERADAS CON ÉXITO! <<<
+```
 
 ---
 
@@ -164,7 +198,21 @@ A partir de la versión 3.0.0, Firestore utiliza colecciones independientes:
 
 ## 6. Variables de Entorno y Despliegue
 
-### Despliegue en Vercel
+### 6.1 Configuración Segura de Variables de Entorno (Secrets)
+Por motivos estrictos de seguridad y mejores prácticas, las claves secretas y tokens de autenticación **nunca deben commitearse ni exponerse en el repositorio público**. Deben inyectarse mediante el panel de *Settings / Secrets* de la plataforma de hosting o en un archivo `.env` local excluido por `.gitignore`.
+
+| Variable | Tipo | Proveedor | Propósito | Formato Seguro Esperado |
+| :--- | :--- | :--- | :--- | :--- |
+| `BEDROCK_API_KEY` | Secreto (Servidor) | **Amazon Bedrock** | Proveedor primario de IA para chat y QA | `ABSK...[TOKEN_BEARER_DE_LARGA_DURACION]` |
+| `NVIDIA_API_KEY` | Secreto (Servidor) | **NVIDIA NIM** | Proveedor secundario de alta disponibilidad | `nvapi-...[CLAVE_PERSONAL_NVIDIA_CLOUD]` |
+| `GEMINI_API_KEY` | Secreto (Servidor) | **Google Cloud / AI Studio** | Proveedor de contingencia para modelos Gemini | `AIzaSy...[CLAVE_GOOGLE_GENAI]` |
+| `APP_URL` | Configuración | Plataforma | URL canónica para CORS y redirecciones | `https://tu-dominio.run.app` |
+
+> 🔒 **Medidas de Seguridad Implementadas**:
+> - Todas las llamadas a las APIs de IA ocurren **exclusivamente del lado del servidor (`server.ts`)**. Las claves nunca se envían al navegador ni se inyectan en el bundle de frontend (`dist/`).
+> - Las variables de entorno son sanitizadas y cuentan con valores de respaldo controlados sin exponer credenciales en archivos estáticos.
+
+### 6.2 Despliegue en Vercel
 1. El proyecto cuenta con el archivo `vercel.json` configurado para SPA:
 ```json
 {

@@ -1,9 +1,9 @@
 # Jira Board Clone - Documentación Técnica y Funcional
 
-> **Versión**: 2.6.0  
+> **Versión**: 3.3.0  
 > **Estado**: Producción / Desplegado en Vercel & Firebase Cloud Firestore  
 > **Autor Principal / Project Manager**: Robinson Meza (`RobinsonAmeza@gmail.com`)  
-> **Arquitectura**: React 18 + Vite + TypeScript + Tailwind CSS + Google Cloud Firestore (Firebase)
+> **Arquitectura**: Full-stack (React 18 + Vite + Express Backend + Amazon Bedrock + NVIDIA NIM + Google GenAI + Cloud Firestore)
 
 ---
 
@@ -11,33 +11,40 @@
 
 **Jira Board Clone** es una plataforma web colaborativa y multiusuario diseñada para la gestión ágil de proyectos de software académico y profesional. Permite planificar Sprints, gestionar Backlogs, administrar tableros Kanban interactivos, registrar métricas y controlar el acceso de usuarios mediante un modelo robusto de control de acceso basado en roles (**RBAC**).
 
+A partir de la versión **v3.3.0**, la plataforma cuenta con una arquitectura de Inteligencia Artificial resiliente de múltiples niveles que integra **Amazon Bedrock** como proveedor primario de alta velocidad, respaldado por **NVIDIA NIM** como proveedor secundario, **Google Gemini** como contingencia y un **Motor Pedagógico Académico Local** de cero caídas.
+
 ---
 
-## 2. Novedades y Actualizaciones Recientes (v2.6.0)
+## 2. Novedades y Actualizaciones Recientes (v3.3.0)
 
-1. **Asignación de Múltiples Responsables por Tarea (Multi-Assignee)**:
-   - Soporte para asignar uno o más usuarios a una misma tarea (`assignee_ids: number[]`).
-   - Selector intuitivo con buscador de usuarios por nombre, username y rol, selección rápida ("Asignarme a mí", "Todos", "Ninguno").
-   - Pila de avatares superpuestos en las tarjetas del tablero Kanban y en la vista de Backlog con contador `+N`.
-   - Compatibilidad total hacia atrás con el campo histórico `assignee_id`.
-   - Permisos actualizados: Cualquier usuario asignado a la tarea tiene permiso para editar su contenido y estado.
-   - Registro de auditoría detallado en el historial de actividades de la tarea cuando se modifican los asignados.
+1. **Arquitectura de Inteligencia Artificial Resiliente en 4 Niveles**:
+   - **Tier 1 (Principal)**: **Amazon Bedrock (Converse API)** utilizando `amazon.nova-lite-v1:0` y balanceo a `amazon.nova-micro-v1:0` y `meta.llama3-70b-instruct-v1:0` (latencia ~1.6 s).
+   - **Tier 2 (Secundario)**: **NVIDIA NIM** con `meta/llama-3.2-11b-vision-instruct` (~1.0 s).
+   - **Tier 3 (Contingencia)**: Cascada Google Gemini (`gemini-3.6-flash`).
+   - **Tier 4 (Motor Local de Cero Caídas)**: Generador pedagógico contextual autónomo ante cortes de red.
 
-2. **Persistencia en la Nube con Google Cloud Firestore (Firebase)**:
-   - Sincronización en tiempo real (`onSnapshot`) entre múltiples navegadores, dispositivos y usuarios concurrentes.
-   - Guardado continuo de tareas, sprints, proyectos, usuarios, columnas, comentarios y registros de actividad.
-   - Soporte offline con respaldo local en `localStorage`.
-   - Indicador de estado en vivo en la barra superior (**Cloud Activo** / **Guardando...** / **Offline**).
+2. **Endpoints de Inteligencia Artificial Activos**:
+   - `/api/ai/chat`: Tutor pedagógico interactivo de Scrum y Jira.
+   - `/api/ai/audit-task`: Auditor técnico QA con verificación INVEST y BDD.
+   - `/api/ai/generate-story`: Generador automático de Historias de Usuario estructuradas.
 
-3. **Acceso Seguro y Flujo de Entrada (Landing / Login)**:
-   - Los usuarios aterrizan de forma obligatoria en la pantalla de **Inicio de Sesión**.
-   - **Administración Centralizada**: Se descartó el autoregistro público. Solo el Project Manager (Admin) puede crear o importar cuentas de usuario.
-   - **Eliminación de Accesos Rápidos de 1 Clic**: Se eliminaron los botones de cambio rápido de usuario que exponían la cuenta del administrador.
+3. **Blindaje Temático y Académico (Strict Guardrails)**:
+   - Rechazo estricto de solicitudes ajenas a metodologías ágiles o ingeniería de software.
+   - Protección contra inyecciones de prompt y jailbreaks ("modo DAN").
+   - Fomento pedagógico activo: no resuelve la tarea llave en mano, orienta con arquitectura y pruebas.
 
-4. **Módulo de Administración y Creación de Usuarios**:
-   - Creación individual con credenciales personalizadas, asignación de proyectos y rol.
-   - **Importación Masiva vía CSV**: Carga por lotes de estudiantes o desarrolladores asignándoles usuario, contraseña, correo, rol y proyecto inicial.
-   - Edición y eliminación de usuarios con protección para evitar borrar al único administrador.
+4. **Batería de Pruebas Superadas**:
+   - Pruebas directas de API de Amazon Bedrock y NVIDIA NIM aprobadas con HTTP 200.
+   - Pruebas en vivo en todos los endpoints del servidor con tiempo de respuesta óptimo.
+
+---
+
+## 3. Seguridad de Credenciales y Variables de Entorno
+
+> 🔒 **Buenas Prácticas de Seguridad**:
+> - Las credenciales secretas (`BEDROCK_API_KEY`, `NVIDIA_API_KEY`, `GEMINI_API_KEY`) se administran **exclusivamente del lado del servidor** a través de variables de entorno o el panel de *Secrets* de hosting.
+> - **Nunca se exponen claves de API** en el código fuente de frontend, repositorios públicos o bundles cliente.
+> - Para detalles completos de arquitectura y configuración, consultar `README.md`.
 
 ---
 

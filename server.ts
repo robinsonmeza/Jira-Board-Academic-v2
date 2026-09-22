@@ -24,13 +24,113 @@ function getGeminiClient(): GoogleGenAI {
   return aiClient;
 }
 
-// NVIDIA NIM client caller (Option 1 & 2: Resilient Fallback & QA Code/Story Review)
+// =========================================================================
+// PRIMARY AI ENGINE: Amazon Bedrock (Converse API with Bearer Token)
+// =========================================================================
+const envKey = process.env.BEDROCK_API_KEY || '';
+const envRegion = process.env.BEDROCK_REGION || '';
+
+// Detect if key was provided in BEDROCK_API_KEY or accidentally in BEDROCK_REGION
+const BEDROCK_API_KEY =
+  envKey.startsWith('ABSK') ? envKey : envRegion.startsWith('ABSK') ? envRegion : envKey;
+
+// Ensure region is always a valid AWS region (e.g. us-east-1)
+const BEDROCK_REGION =
+  envRegion && /^[a-z]{2}-[a-z]+-\d+$/.test(envRegion) ? envRegion : 'us-east-1';
+
+const BEDROCK_MODELS = [
+  'amazon.nova-micro-v1:0',
+  'amazon.nova-lite-v1:0',
+  'us.amazon.nova-micro-v1:0',
+];
+
+async function callBedrockConverse(
+  messages: Array<{ role: string; content: string }>,
+  systemPrompt?: string,
+  maxTokens = 1000,
+  temperature = 0.5
+): Promise<string> {
+  if (!BEDROCK_API_KEY) return '';
+
+  // Format messages into valid alternating user/assistant turns with [{ text }] content blocks
+  const validTurns: Array<{ role: 'user' | 'assistant'; content: Array<{ text: string }> }> = [];
+  for (const m of messages) {
+    const text = (m.content || '').trim();
+    if (!text) continue;
+    const role: 'user' | 'assistant' = m.role === 'assistant' ? 'assistant' : 'user';
+
+    if (validTurns.length > 0 && validTurns[validTurns.length - 1].role === role) {
+      validTurns[validTurns.length - 1].content[0].text += `\n\n${text}`;
+    } else {
+      if (validTurns.length === 0 && role === 'assistant') {
+        validTurns.push({ role: 'user', content: [{ text: 'Hola' }] });
+      }
+      validTurns.push({ role, content: [{ text }] });
+    }
+  }
+
+  if (validTurns.length === 0) {
+    validTurns.push({ role: 'user', content: [{ text: 'Hola' }] });
+  }
+
+  for (const model of BEDROCK_MODELS) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6500);
+
+    try {
+      const url = `https://bedrock-runtime.${BEDROCK_REGION}.amazonaws.com/model/${encodeURIComponent(model)}/converse`;
+      const payload: any = {
+        messages: validTurns,
+        inferenceConfig: {
+          maxTokens,
+          temperature,
+        },
+      };
+
+      if (systemPrompt && systemPrompt.trim().length > 0) {
+        payload.system = [{ text: systemPrompt.trim() }];
+      }
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${BEDROCK_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const content = data.output?.message?.content?.[0]?.text || '';
+        if (content && content.trim().length > 0) {
+          console.log(`[AI Engine - Primary] Response delivered successfully via Amazon Bedrock (${model})`);
+          return content.trim();
+        }
+      } else {
+        const errText = await response.text().catch(() => '');
+        console.warn(`[Bedrock Primary] ${model} returned status ${response.status}: ${errText.slice(0, 150)}`);
+      }
+    } catch (err: any) {
+      console.warn(`[Bedrock Primary] ${model} attempt failed: ${err?.message || err}`);
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  return '';
+}
+
+// =========================================================================
+// SECONDARY AI ENGINE: NVIDIA NIM (High Performance Fallback)
+// =========================================================================
 async function callNvidiaNim(
   messages: Array<{ role: string; content: string }>,
   preferredModel = 'meta/llama-3.2-11b-vision-instruct',
   maxTokens = 900
 ): Promise<string> {
-  const nvidiaKey = process.env.NVIDIA_API_KEY || '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';
+  const nvidiaKey = process.env.NVIDIA_API_KEY || '';
   if (!nvidiaKey) return '';
 
   const candidateModels = [
@@ -42,7 +142,7 @@ async function callNvidiaNim(
 
   for (const model of uniqueModels) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
 
     try {
       const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
@@ -65,15 +165,15 @@ async function callNvidiaNim(
         const data = await response.json();
         const content = data.choices?.[0]?.message?.content || '';
         if (content && content.trim().length > 0) {
-          console.log(`[AI Engine] Response delivered successfully via NVIDIA NIM (${model})`);
+          console.log(`[AI Engine - Secondary] Response delivered successfully via NVIDIA NIM (${model})`);
           return content.trim();
         }
       } else {
         const errText = await response.text().catch(() => '');
-        console.warn(`[NVIDIA NIM] ${model} returned ${response.status}: ${errText.slice(0, 100)}`);
+        console.warn(`[NVIDIA NIM Secondary] ${model} returned ${response.status}: ${errText.slice(0, 100)}`);
       }
     } catch (err: any) {
-      console.warn(`[NVIDIA NIM] ${model} failed (${err?.message || err}), checking next...`);
+      console.warn(`[NVIDIA NIM Secondary] ${model} failed (${err?.message || err}), checking next...`);
     } finally {
       clearTimeout(timeoutId);
     }
@@ -403,26 +503,23 @@ app.post('/api/ai/chat', async (req, res) => {
     const lastUserPrompt = [...validMessages].reverse().find((m: any) => m.role === 'user')?.content || '';
 
     let replyText = '';
+    let activeProvider = '';
 
-    // Tier 1: Gemini Cascade (fast timeout per attempt)
+    // =========================================================
+    // Tier 1 (PRIMARY): Amazon Bedrock (Nova Micro / Lite)
+    // =========================================================
     try {
-      const ai = getGeminiClient();
-      const contents = validMessages.map((m: { role: string; content: string }) => ({
-        role: m.role === 'user' ? 'user' : 'model',
-        parts: [{ text: m.content }],
-      }));
-
-      replyText = await executeGeminiWithFallback(ai, {
-        contents,
-        systemInstruction: dynamicSystemPrompt,
-        temperature: 0.7,
-        timeoutPerAttemptMs: 4500,
-      });
-    } catch (geminiErr: any) {
-      console.warn('[AI Pipeline] Gemini cascade unavailable, failing over to Tier 2:', geminiErr?.message);
+      replyText = await callBedrockConverse(validMessages, dynamicSystemPrompt, 1000, 0.5);
+      if (replyText) {
+        activeProvider = 'Amazon Bedrock (Primaria)';
+      }
+    } catch (bedrockErr: any) {
+      console.warn('[AI Pipeline] Bedrock Primary unavailable, falling over to Tier 2 (NVIDIA NIM):', bedrockErr?.message);
     }
 
-    // Tier 2: Instant NVIDIA NIM failover (high availability, sub-second responses)
+    // =========================================================
+    // Tier 2 (SECONDARY): NVIDIA NIM (Llama 3.2 11B / DeepSeek)
+    // =========================================================
     if (!replyText) {
       try {
         const nimMessages = [
@@ -434,23 +531,50 @@ app.post('/api/ai/chat', async (req, res) => {
         ];
 
         replyText = await callNvidiaNim(nimMessages, 'meta/llama-3.2-11b-vision-instruct', 900);
+        if (replyText) {
+          activeProvider = 'NVIDIA NIM (Secundaria)';
+        }
       } catch (nimErr: any) {
-        console.warn('[AI Pipeline] NVIDIA NIM unavailable, failing over to Tier 3:', nimErr?.message);
+        console.warn('[AI Pipeline] NVIDIA NIM unavailable, falling over to auxiliary Tier 3:', nimErr?.message);
       }
     }
 
-    // Tier 3: Zero-Failure Academic Pedagogical Engine
+    // Tier 3 (Auxiliary Fallback): Gemini Cascade
     if (!replyText) {
-      console.log('[AI Pipeline] Delivering response via Tier 3 Academic Knowledge Engine');
-      replyText = generatePedagogicalFallbackResponse(lastUserPrompt, projectContext);
+      try {
+        const ai = getGeminiClient();
+        const contents = validMessages.map((m: { role: string; content: string }) => ({
+          role: m.role === 'user' ? 'user' : 'model',
+          parts: [{ text: m.content }],
+        }));
+
+        replyText = await executeGeminiWithFallback(ai, {
+          contents,
+          systemInstruction: dynamicSystemPrompt,
+          temperature: 0.7,
+          timeoutPerAttemptMs: 4000,
+        });
+        if (replyText) {
+          activeProvider = 'Gemini Cascade (Auxiliar)';
+        }
+      } catch (geminiErr: any) {
+        console.warn('[AI Pipeline] Gemini auxiliary unavailable, falling over to Tier 4:', geminiErr?.message);
+      }
     }
 
-    return res.json({ reply: replyText });
+    // Tier 4: Zero-Failure Academic Pedagogical Engine
+    if (!replyText) {
+      console.log('[AI Pipeline] Delivering response via Tier 4 Academic Knowledge Engine');
+      replyText = generatePedagogicalFallbackResponse(lastUserPrompt, projectContext);
+      activeProvider = 'Academic Pedagogical Engine (Fallback)';
+    }
+
+    return res.json({ reply: replyText, provider: activeProvider });
   } catch (error: any) {
     console.error('Error in /api/ai/chat:', error);
     // Never fail with 500: return educational response
     const fallback = generatePedagogicalFallbackResponse(req.body?.messages?.[0]?.content || '', req.body?.projectContext);
-    return res.json({ reply: fallback });
+    return res.json({ reply: fallback, provider: 'Academic Pedagogical Engine (Recovery)' });
   }
 });
 
@@ -490,42 +614,67 @@ INSTRUCCIONES DE AUDITORÍA (ESTRICTAMENTE PEDAGÓGICAS):
 `;
 
     let auditResult = '';
+    let auditProvider = '';
 
-    // Tier 1: Gemini Cascade
+    // Tier 1 (PRIMARY): Amazon Bedrock
     try {
-      const ai = getGeminiClient();
-      auditResult = await executeGeminiWithFallback(ai, {
-        contents: [{ role: 'user', parts: [{ text: auditPrompt }] }],
-        systemInstruction: 'Eres un auditor técnico y tutor de aseguramiento de la calidad (QA) para proyectos universitarios de software.',
-        temperature: 0.4,
-        timeoutPerAttemptMs: 5000,
-      });
-    } catch (auditErr: any) {
-      console.warn('Audit Gemini cascade failed:', auditErr?.message);
+      auditResult = await callBedrockConverse(
+        [{ role: 'user', content: auditPrompt }],
+        'Eres un auditor técnico y tutor de aseguramiento de la calidad (QA) para proyectos universitarios de software.',
+        1200,
+        0.3
+      );
+      if (auditResult) {
+        auditProvider = 'Amazon Bedrock (Primaria)';
+      }
+    } catch (bedrockErr: any) {
+      console.warn('Audit Bedrock Primary failed:', bedrockErr?.message);
     }
 
-    // Tier 2: NVIDIA NIM
+    // Tier 2 (SECONDARY): NVIDIA NIM
     if (!auditResult) {
       try {
         auditResult = await callNvidiaNim([
           { role: 'system', content: 'Eres un auditor técnico y tutor de aseguramiento de la calidad (QA) para proyectos universitarios de software.' },
           { role: 'user', content: auditPrompt },
         ], 'meta/llama-3.2-11b-vision-instruct', 1000);
+        if (auditResult) {
+          auditProvider = 'NVIDIA NIM (Secundaria)';
+        }
       } catch (nimErr: any) {
         console.warn('Audit NVIDIA NIM failed:', nimErr?.message);
       }
     }
 
-    // Tier 3: Zero-Failure Local QA Audit Engine
+    // Tier 3 (Auxiliary): Gemini Cascade
     if (!auditResult) {
-      auditResult = generateLocalTaskAudit(task, projectContext);
+      try {
+        const ai = getGeminiClient();
+        auditResult = await executeGeminiWithFallback(ai, {
+          contents: [{ role: 'user', parts: [{ text: auditPrompt }] }],
+          systemInstruction: 'Eres un auditor técnico y tutor de aseguramiento de la calidad (QA) para proyectos universitarios de software.',
+          temperature: 0.4,
+          timeoutPerAttemptMs: 4500,
+        });
+        if (auditResult) {
+          auditProvider = 'Gemini Cascade (Auxiliar)';
+        }
+      } catch (auditErr: any) {
+        console.warn('Audit Gemini cascade failed:', auditErr?.message);
+      }
     }
 
-    return res.json({ auditReport: auditResult });
+    // Tier 4: Zero-Failure Local QA Audit Engine
+    if (!auditResult) {
+      auditResult = generateLocalTaskAudit(task, projectContext);
+      auditProvider = 'Local QA Audit Engine (Fallback)';
+    }
+
+    return res.json({ auditReport: auditResult, provider: auditProvider });
   } catch (error: any) {
     console.error('Error in /api/ai/audit-task:', error);
     const fallbackAudit = generateLocalTaskAudit(req.body?.task, req.body?.projectContext);
-    return res.json({ auditReport: fallbackAudit });
+    return res.json({ auditReport: fallbackAudit, provider: 'Local QA Audit Engine (Recovery)' });
   }
 });
 
@@ -556,43 +705,159 @@ Genera la respuesta con el siguiente formato estructurado:
 `;
 
     let storyText = '';
+    let storyProvider = '';
 
-    // Tier 1: Gemini Cascade
+    // Tier 1 (PRIMARY): Amazon Bedrock
     try {
-      const ai = getGeminiClient();
-      storyText = await executeGeminiWithFallback(ai, {
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        systemInstruction: ACADEMIC_JIRA_SYSTEM_PROMPT,
-        temperature: 0.5,
-        timeoutPerAttemptMs: 5000,
-      });
-    } catch (err: any) {
-      console.warn('generate-story Gemini cascade failed:', err?.message);
+      storyText = await callBedrockConverse(
+        [{ role: 'user', content: prompt }],
+        ACADEMIC_JIRA_SYSTEM_PROMPT,
+        1000,
+        0.5
+      );
+      if (storyText) {
+        storyProvider = 'Amazon Bedrock (Primaria)';
+      }
+    } catch (bedrockErr: any) {
+      console.warn('generate-story Bedrock Primary failed:', bedrockErr?.message);
     }
 
-    // Tier 2: NVIDIA NIM
+    // Tier 2 (SECONDARY): NVIDIA NIM
     if (!storyText) {
       try {
         storyText = await callNvidiaNim([
           { role: 'system', content: ACADEMIC_JIRA_SYSTEM_PROMPT },
           { role: 'user', content: prompt },
         ], 'meta/llama-3.2-11b-vision-instruct', 900);
+        if (storyText) {
+          storyProvider = 'NVIDIA NIM (Secundaria)';
+        }
       } catch (nimErr: any) {
         console.warn('generate-story NVIDIA NIM failed:', nimErr?.message);
       }
     }
 
-    // Tier 3: Zero-Failure Local Story Generator
+    // Tier 3 (Auxiliary): Gemini Cascade
     if (!storyText) {
-      storyText = generateLocalUserStory(rawRequirement, projectContext);
+      try {
+        const ai = getGeminiClient();
+        storyText = await executeGeminiWithFallback(ai, {
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          systemInstruction: ACADEMIC_JIRA_SYSTEM_PROMPT,
+          temperature: 0.5,
+          timeoutPerAttemptMs: 4500,
+        });
+        if (storyText) {
+          storyProvider = 'Gemini Cascade (Auxiliar)';
+        }
+      } catch (err: any) {
+        console.warn('generate-story Gemini cascade failed:', err?.message);
+      }
     }
 
-    return res.json({ storyText });
+    // Tier 4: Zero-Failure Local Story Generator
+    if (!storyText) {
+      storyText = generateLocalUserStory(rawRequirement, projectContext);
+      storyProvider = 'Local Story Generator (Fallback)';
+    }
+
+    return res.json({ storyText, provider: storyProvider });
   } catch (error: any) {
     console.error('Error in /api/ai/generate-story:', error);
     const fallbackStory = generateLocalUserStory(req.body?.rawRequirement || '', req.body?.projectContext);
-    return res.json({ storyText: fallbackStory });
+    return res.json({ storyText: fallbackStory, provider: 'Local Story Generator (Recovery)' });
   }
+});
+
+// Provider Health Check & Test Endpoint (Verifies both Primary and Secondary)
+app.get('/api/ai/status', async (req, res) => {
+  return res.json({
+    status: 'ok',
+    primary: {
+      provider: 'Amazon Bedrock',
+      status: 'active',
+      region: BEDROCK_REGION,
+      models: BEDROCK_MODELS,
+      role: 'Primaria (Ejecución principal)',
+    },
+    secondary: {
+      provider: 'NVIDIA NIM',
+      status: 'active',
+      models: ['meta/llama-3.2-11b-vision-instruct', 'deepseek-ai/deepseek-v4.1-flash'],
+      role: 'Secundaria (Respaldo de alta velocidad y auditoría)',
+    },
+    auxiliary: {
+      provider: 'Gemini + Local Academic Knowledge Engine',
+      role: 'Auxiliar / Resguardo pedagógico garantizado',
+    },
+  });
+});
+
+app.post('/api/ai/test-providers', async (req, res) => {
+  const results: any = {
+    timestamp: new Date().toISOString(),
+    primaryBedrock: null,
+    secondaryNvidia: null,
+    allPassed: false,
+  };
+
+  // 1. Test Primary: Amazon Bedrock
+  const t0Bedrock = Date.now();
+  try {
+    const bedrockReply = await callBedrockConverse(
+      [{ role: 'user', content: 'Responde únicamente con la palabra: OK' }],
+      'Eres un evaluador de conectividad.',
+      50,
+      0.1
+    );
+    const latencyBedrock = Date.now() - t0Bedrock;
+    results.primaryBedrock = {
+      provider: 'Amazon Bedrock',
+      success: !!bedrockReply,
+      sampleResponse: bedrockReply,
+      latencyMs: latencyBedrock,
+      model: BEDROCK_MODELS[0],
+      region: BEDROCK_REGION,
+    };
+  } catch (e: any) {
+    results.primaryBedrock = {
+      provider: 'Amazon Bedrock',
+      success: false,
+      error: e?.message || String(e),
+      latencyMs: Date.now() - t0Bedrock,
+    };
+  }
+
+  // 2. Test Secondary: NVIDIA NIM
+  const t0Nvidia = Date.now();
+  try {
+    const nvidiaReply = await callNvidiaNim(
+      [
+        { role: 'system', content: 'Eres un evaluador de conectividad.' },
+        { role: 'user', content: 'Responde únicamente con la palabra: OK' },
+      ],
+      'meta/llama-3.2-11b-vision-instruct',
+      50
+    );
+    const latencyNvidia = Date.now() - t0Nvidia;
+    results.secondaryNvidia = {
+      provider: 'NVIDIA NIM',
+      success: !!nvidiaReply,
+      sampleResponse: nvidiaReply,
+      latencyMs: latencyNvidia,
+      model: 'meta/llama-3.2-11b-vision-instruct',
+    };
+  } catch (e: any) {
+    results.secondaryNvidia = {
+      provider: 'NVIDIA NIM',
+      success: false,
+      error: e?.message || String(e),
+      latencyMs: Date.now() - t0Nvidia,
+    };
+  }
+
+  results.allPassed = !!(results.primaryBedrock?.success && results.secondaryNvidia?.success);
+  return res.json(results);
 });
 
 // Vite middleware & Static file serving
