@@ -46,46 +46,46 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, 
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
-          <div className="flex items-center gap-2 text-slate-900 font-bold text-base tracking-tight">
-            <FolderPlus className="w-5 h-5 text-indigo-600" />
-            <span>Crear Nuevo Proyecto</span>
+    <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4 font-mono">
+      <div className="bg-white border-4 border-black brutal-shadow-lg max-w-md w-full overflow-hidden">
+        <div className="px-6 py-4 border-b-2 border-black flex items-center justify-between bg-yellow-400">
+          <div className="flex items-center gap-2 text-black font-black text-sm uppercase tracking-wider">
+            <FolderPlus className="w-5 h-5 stroke-[2.5]" />
+            <span>CREAR NUEVO PROYECTO</span>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-200/60 transition-colors"
+            className="text-black hover:bg-neutral-200 border-2 border-black p-1 bg-white cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 stroke-[3]" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+            <div className="p-3 bg-red-100 border-2 border-black text-red-900 text-xs font-bold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-600 stroke-[2.5]" />
               <span>{error}</span>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-              Nombre del proyecto *
+            <label className="block text-xs font-black text-black uppercase tracking-wider mb-1">
+              NOMBRE DEL PROYECTO *
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
               placeholder="ej. Sistema de Gestión Web"
-              className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all shadow-2xs"
+              className="w-full px-3.5 py-2 border-2 border-black text-xs font-bold outline-none focus:bg-yellow-50"
               required
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-              Clave del proyecto * <span className="text-slate-400 font-normal lowercase">(ej: PRJ, PRO)</span>
+            <label className="block text-xs font-black text-black uppercase tracking-wider mb-1">
+              CLAVE DEL PROYECTO * <span className="text-neutral-600 font-bold lowercase">(ej: PRJ, PRO)</span>
             </label>
             <input
               type="text"
@@ -93,40 +93,40 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, 
               onChange={(e) => setKey(e.target.value.toUpperCase())}
               placeholder="PRJ"
               maxLength={10}
-              className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm font-mono uppercase focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all shadow-2xs"
+              className="w-full px-3.5 py-2 border-2 border-black text-xs font-bold uppercase outline-none focus:bg-yellow-50"
               required
             />
-            <p className="text-[11px] text-slate-500 mt-1">
-              Se utilizará como prefijo para todas las tareas (ej. {key || 'PRJ'}-1).
+            <p className="text-[11px] font-bold text-neutral-600 mt-1 uppercase">
+              PREFIJO DE TAREAS (EJ. {key || 'PRJ'}-1).
             </p>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-              Descripción
+            <label className="block text-xs font-black text-black uppercase tracking-wider mb-1">
+              DESCRIPCIÓN
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Breve descripción de los objetivos del proyecto..."
               rows={3}
-              className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all shadow-2xs"
+              className="w-full px-3.5 py-2 border-2 border-black text-xs font-bold outline-none focus:bg-yellow-50"
             />
           </div>
 
-          <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+          <div className="pt-3 border-t-2 border-black flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+              className="px-4 py-2 text-xs font-black uppercase text-black bg-white hover:bg-neutral-200 border-2 border-black brutal-shadow-sm brutal-btn cursor-pointer"
             >
-              Cancelar
+              CANCELAR
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-colors shadow-2xs"
+              className="px-5 py-2 text-xs font-black uppercase text-black bg-orange-500 hover:bg-orange-400 border-2 border-black brutal-shadow brutal-btn cursor-pointer"
             >
-              Crear Proyecto
+              CREAR PROYECTO
             </button>
           </div>
         </form>
@@ -168,69 +168,69 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({ project, isO
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
-          <div className="flex items-center gap-2 text-slate-900 font-bold text-base tracking-tight">
-            <span className="font-mono bg-indigo-50 text-indigo-700 border border-indigo-200/80 text-xs px-2 py-0.5 rounded-md font-bold">
+    <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4 font-mono">
+      <div className="bg-white border-4 border-black brutal-shadow-lg max-w-md w-full overflow-hidden">
+        <div className="px-6 py-4 border-b-2 border-black flex items-center justify-between bg-yellow-400">
+          <div className="flex items-center gap-2 text-black font-black text-sm uppercase tracking-wider">
+            <span className="bg-black text-white text-xs px-2 py-0.5 font-black">
               {project.key}
             </span>
-            <span>Editar Proyecto</span>
+            <span>EDITAR PROYECTO</span>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-200/60 transition-colors"
+            className="text-black hover:bg-neutral-200 border-2 border-black p-1 bg-white cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 stroke-[3]" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+            <div className="p-3 bg-red-100 border-2 border-black text-red-900 text-xs font-bold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-600 stroke-[2.5]" />
               <span>{error}</span>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-              Nombre del proyecto *
+            <label className="block text-xs font-black text-black uppercase tracking-wider mb-1">
+              NOMBRE DEL PROYECTO *
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all shadow-2xs"
+              className="w-full px-3.5 py-2 border-2 border-black text-xs font-bold outline-none focus:bg-yellow-50"
               required
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-              Descripción
+            <label className="block text-xs font-black text-black uppercase tracking-wider mb-1">
+              DESCRIPCIÓN
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all shadow-2xs"
+              className="w-full px-3.5 py-2 border-2 border-black text-xs font-bold outline-none focus:bg-yellow-50"
             />
           </div>
 
-          <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+          <div className="pt-3 border-t-2 border-black flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+              className="px-4 py-2 text-xs font-black uppercase text-black bg-white hover:bg-neutral-200 border-2 border-black brutal-shadow-sm brutal-btn cursor-pointer"
             >
-              Cancelar
+              CANCELAR
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-colors shadow-2xs"
+              className="px-5 py-2 text-xs font-black uppercase text-black bg-orange-500 hover:bg-orange-400 border-2 border-black brutal-shadow brutal-btn cursor-pointer"
             >
-              Guardar Cambios
+              GUARDAR CAMBIOS
             </button>
           </div>
         </form>

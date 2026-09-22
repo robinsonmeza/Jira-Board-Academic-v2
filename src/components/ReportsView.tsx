@@ -109,54 +109,54 @@ export const ReportsView: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-mono">
       {/* Summary KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-600">Total Tareas</span>
-            <div className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
-              <Layers className="w-4 h-4" />
+        <div className="bg-white p-4 border-4 border-black brutal-shadow">
+          <div className="flex items-center justify-between text-black mb-2">
+            <span className="text-xs font-black uppercase tracking-wider">TOTAL TAREAS</span>
+            <div className="p-1 border border-black bg-yellow-400 text-black">
+              <Layers className="w-4 h-4 stroke-[2.5]" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-slate-900 tracking-tight">{projectTasks.length}</div>
-          <p className="text-[11px] text-slate-400 mt-1">Issues registradas en el proyecto</p>
+          <div className="text-3xl font-black text-black tracking-tight">{projectTasks.length}</div>
+          <p className="text-[10px] font-bold text-neutral-600 mt-1 uppercase">ISSUES EN EL PROYECTO</p>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-600">Story Points</span>
-            <div className="p-1.5 rounded-lg bg-amber-50 text-amber-600">
-              <Award className="w-4 h-4" />
+        <div className="bg-white p-4 border-4 border-black brutal-shadow">
+          <div className="flex items-center justify-between text-black mb-2">
+            <span className="text-xs font-black uppercase tracking-wider">STORY POINTS</span>
+            <div className="p-1 border border-black bg-orange-400 text-black">
+              <Award className="w-4 h-4 stroke-[2.5]" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-slate-900 tracking-tight">{totalPoints} pts</div>
-          <p className="text-[11px] text-slate-400 mt-1">Estimación total del backlog</p>
+          <div className="text-3xl font-black text-black tracking-tight">{totalPoints} PTS</div>
+          <p className="text-[10px] font-bold text-neutral-600 mt-1 uppercase">CARGA TOTAL BACKLOG</p>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-600">Puntos Completados</span>
-            <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
-              <CheckCircle2 className="w-4 h-4" />
+        <div className="bg-white p-4 border-4 border-black brutal-shadow">
+          <div className="flex items-center justify-between text-black mb-2">
+            <span className="text-xs font-black uppercase tracking-wider">PTS COMPLETADOS</span>
+            <div className="p-1 border border-black bg-emerald-400 text-black">
+              <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-emerald-600 tracking-tight">{donePoints} pts</div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            {totalPoints > 0 ? Math.round((donePoints / totalPoints) * 100) : 0}% de avance global
+          <div className="text-3xl font-black text-black tracking-tight">{donePoints} PTS</div>
+          <p className="text-[10px] font-bold text-neutral-600 mt-1 uppercase">
+            {totalPoints > 0 ? Math.round((donePoints / totalPoints) * 100) : 0}% AVANCE GLOBAL
           </p>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-600">Sprints Creados</span>
-            <div className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
-              <TrendingDown className="w-4 h-4" />
+        <div className="bg-white p-4 border-4 border-black brutal-shadow">
+          <div className="flex items-center justify-between text-black mb-2">
+            <span className="text-xs font-black uppercase tracking-wider">TOTAL SPRINTS</span>
+            <div className="p-1 border border-black bg-yellow-400 text-black">
+              <TrendingDown className="w-4 h-4 stroke-[2.5]" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-slate-900 tracking-tight">{projectSprints.length}</div>
-          <p className="text-[11px] text-slate-400 mt-1 truncate">
-            {activeSprint ? `Activo: ${activeSprint.name}` : 'Sin sprint activo'}
+          <div className="text-3xl font-black text-black tracking-tight">{projectSprints.length}</div>
+          <p className="text-[10px] font-bold text-neutral-600 mt-1 uppercase truncate">
+            {activeSprint ? `ACTIVO: ${activeSprint.name}` : 'SIN SPRINT ACTIVO'}
           </p>
         </div>
       </div>
@@ -164,19 +164,19 @@ export const ReportsView: React.FC = () => {
       {/* Main Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 1. Burndown Chart */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-white p-5 border-4 border-black brutal-shadow">
+          <div className="flex items-center justify-between mb-4 border-b-2 border-black pb-2">
             <div>
-              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 tracking-tight">
-                <TrendingDown className="w-4 h-4 text-indigo-600" />
-                Sprint Burndown Chart
+              <h3 className="font-black text-sm text-black flex items-center gap-2 uppercase tracking-wide">
+                <TrendingDown className="w-4 h-4 stroke-[2.5]" />
+                BURNDOWN CHART (SPRINT)
               </h3>
-              <p className="text-xs text-slate-500">
-                {burndownSprint ? burndownSprint.name : 'Sprint actual'} (Puntos restantes vs Ideal)
+              <p className="text-xs font-bold text-neutral-600 uppercase">
+                {burndownSprint ? burndownSprint.name : 'Sprint actual'} (PUNTOS RESTANTES VS IDEAL)
               </p>
             </div>
-            <span className="text-xs bg-indigo-50 text-indigo-700 border border-indigo-200/80 px-2 py-0.5 rounded-md font-mono font-bold">
-              {sprintTotalPoints} pts
+            <span className="text-xs bg-black text-white px-2 py-0.5 font-mono font-black border border-black">
+              {sprintTotalPoints} PTS
             </span>
           </div>
 

@@ -70,34 +70,34 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenBoard }) => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 font-mono">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b-2 border-black">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
-              <FolderKanban className="w-7 h-7 text-indigo-600" />
-              <span>Proyectos</span>
+            <h1 className="text-2xl font-black text-black tracking-wider uppercase flex items-center gap-2.5">
+              <FolderKanban className="w-8 h-8 text-black stroke-[2.5]" />
+              <span>PROYECTOS_ACTIVOS</span>
             </h1>
             {isPM && (
-              <span className="bg-amber-50 text-amber-800 border border-amber-200 text-xs font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
-                Project Manager (Global)
+              <span className="bg-yellow-400 text-black border-2 border-black text-xs font-black px-2.5 py-0.5 brutal-shadow-sm flex items-center gap-1 uppercase">
+                <ShieldCheck className="w-3.5 h-3.5 stroke-[3]" />
+                PROJECT MANAGER
               </span>
             )}
             {isPO && (
-              <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                <GraduationCap className="w-3.5 h-3.5 text-indigo-600" />
-                Product Owner (Gestión Total de Proyectos)
+              <span className="bg-orange-400 text-black border-2 border-black text-xs font-black px-2.5 py-0.5 brutal-shadow-sm flex items-center gap-1 uppercase">
+                <GraduationCap className="w-3.5 h-3.5 stroke-[3]" />
+                PRODUCT OWNER
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs font-bold text-neutral-600 mt-1 uppercase">
             {isPM
-              ? 'Supervisa el rendimiento, estado de sprints y asignación de tareas de todos los proyectos activos.'
+              ? 'SUPERVISIÓN GLOBAL DE RENDIMIENTO, SPRINTS Y CARGA DE TRABAJO.'
               : isPO
-              ? 'Visualiza el dashboard interactivo de tus proyectos, gestiona sprints, tableros y miembros del equipo.'
-              : `Proyectos asignados a tu perfil de ${ROLE_LABELS[currentUser?.role || 'frontend']}.`}
+              ? 'GESTIÓN INTEGRAL DE PROYECTOS, SPRINTS Y CAPACIDAD TÉCNICA.'
+              : `ROL OPERATIVO: ${ROLE_LABELS[currentUser?.role || 'frontend'].toUpperCase()}.`}
           </p>
         </div>
 
@@ -107,11 +107,11 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenBoard }) => {
           {isPM && (
             <button
               onClick={() => setIsManageUsersOpen(true)}
-              className="inline-flex items-center gap-2 px-3.5 py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 hover:bg-indigo-100 text-xs font-semibold rounded-xl transition-all shadow-2xs"
+              className="inline-flex items-center gap-2 px-3.5 py-2 bg-yellow-400 hover:bg-yellow-300 border-2 border-black text-black text-xs font-black uppercase brutal-shadow-sm brutal-btn cursor-pointer"
               title="Administrar, editar nombres, roles y contraseñas de usuarios"
             >
-              <UserCog className="w-4 h-4 text-indigo-600" />
-              <span>Gestionar Usuarios</span>
+              <UserCog className="w-4 h-4 stroke-[2.5]" />
+              <span>USUARIOS</span>
             </button>
           )}
 
@@ -119,11 +119,11 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenBoard }) => {
           {isPM && (
             <button
               onClick={() => setIsCsvModalOpen(true)}
-              className="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl transition-all shadow-2xs shadow-emerald-600/20"
+              className="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-400 hover:bg-emerald-300 border-2 border-black text-black text-xs font-black uppercase brutal-shadow-sm brutal-btn cursor-pointer"
               title="Importar grupo masivo de usuarios desde archivo CSV con asignación automática a grupos"
             >
-              <FileSpreadsheet className="w-4 h-4" />
-              <span>Importar CSV</span>
+              <FileSpreadsheet className="w-4 h-4 stroke-[2.5]" />
+              <span>IMPORTAR CSV</span>
             </button>
           )}
 
@@ -131,18 +131,18 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenBoard }) => {
             <>
               <button
                 onClick={() => setIsCreateMemberOpen(true)}
-                className="inline-flex items-center gap-2 px-3.5 py-2 border border-slate-300 hover:border-slate-400 bg-white text-slate-700 hover:bg-slate-50 text-xs font-semibold rounded-xl transition-all shadow-2xs"
+                className="inline-flex items-center gap-2 px-3.5 py-2 border-2 border-black bg-white hover:bg-neutral-100 text-black text-xs font-black uppercase brutal-shadow-sm brutal-btn cursor-pointer"
               >
-                <UserPlus className="w-4 h-4 text-indigo-600" />
-                <span>Crear Usuario</span>
+                <UserPlus className="w-4 h-4 stroke-[2.5]" />
+                <span>+ USUARIO</span>
               </button>
 
               <button
                 onClick={() => setIsCreateProjectOpen(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition-all shadow-sm shadow-indigo-500/25"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-400 border-2 border-black text-black text-xs font-black uppercase brutal-shadow brutal-btn cursor-pointer"
               >
-                <Plus className="w-4 h-4" />
-                <span>Crear Proyecto</span>
+                <Plus className="w-4 h-4 stroke-[3]" />
+                <span>+ NUEVO PROYECTO</span>
               </button>
             </>
           )}
@@ -152,43 +152,43 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenBoard }) => {
       {/* View Mode Switcher and Global Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Toggle between Dashboard and Grid */}
-        <div className="inline-flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold self-start">
+        <div className="inline-flex bg-white p-1 border-2 border-black brutal-shadow-sm text-xs font-black self-start">
           <button
             type="button"
             onClick={() => setViewMode('dashboard')}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg transition-all ${
+            className={`inline-flex items-center gap-2 px-3.5 py-1.5 uppercase transition-all cursor-pointer ${
               viewMode === 'dashboard'
-                ? 'bg-white text-indigo-600 shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-yellow-400 text-black border border-black font-black'
+                : 'text-neutral-700 hover:text-black hover:bg-neutral-100'
             }`}
           >
             <LayoutDashboard className="w-3.5 h-3.5" />
-            <span>Dashboard Interactivo</span>
+            <span>MÉTRICAS & CONTROL</span>
           </button>
 
           <button
             type="button"
             onClick={() => setViewMode('grid')}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg transition-all ${
+            className={`inline-flex items-center gap-2 px-3.5 py-1.5 uppercase transition-all cursor-pointer ${
               viewMode === 'grid'
-                ? 'bg-white text-indigo-600 shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-yellow-400 text-black border border-black font-black'
+                : 'text-neutral-700 hover:text-black hover:bg-neutral-100'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
-            <span>Vista de Cuadrícula</span>
+            <span>CUADRÍCULA</span>
           </button>
         </div>
 
         {viewMode === 'grid' && (
           <div className="relative max-w-xs w-full">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-black absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar proyectos..."
-              className="w-full pl-9 pr-3 py-1.5 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-indigo-500 outline-none shadow-2xs"
+              placeholder="BUSCAR PROYECTO..."
+              className="w-full pl-9 pr-3 py-1.5 border-2 border-black bg-white text-xs font-bold uppercase text-black placeholder:text-neutral-400 focus:bg-yellow-100 outline-none brutal-shadow-sm"
             />
           </div>
         )}
@@ -231,12 +231,12 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenBoard }) => {
               return (
                 <div
                   key={project.id}
-                  className="bg-white rounded-2xl border border-slate-200 hover:border-indigo-300 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group"
+                  className="bg-white border-4 border-black brutal-shadow hover:brutal-shadow-lg transition-all flex flex-col justify-between overflow-hidden group"
                 >
                   <div className="p-5">
                     {/* Top Bar */}
                     <div className="flex items-start justify-between gap-3 mb-3">
-                      <span className="font-mono text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/70 px-2.5 py-0.5 rounded-lg shadow-2xs">
+                      <span className="font-mono text-xs font-black bg-yellow-400 text-black border-2 border-black px-2.5 py-0.5 brutal-shadow-sm uppercase">
                         {project.key}
                       </span>
 
@@ -245,14 +245,14 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenBoard }) => {
                         <div className="relative">
                           <button
                             onClick={() => setActiveMenuId(activeMenuId === project.id ? null : project.id)}
-                            className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                            className="p-1 border border-black hover:bg-neutral-200 transition-colors cursor-pointer"
                           >
-                            <MoreVertical className="w-4 h-4" />
+                            <MoreVertical className="w-4 h-4 text-black" />
                           </button>
 
                           {activeMenuId === project.id && (
                             <div
-                              className="absolute right-0 mt-1 w-36 bg-white border border-slate-200 rounded-xl shadow-xl py-1 z-30 text-xs"
+                              className="absolute right-0 mt-1 w-36 bg-white border-2 border-black brutal-shadow py-1 z-30 text-xs font-mono"
                               onMouseLeave={() => setActiveMenuId(null)}
                             >
                               <button
@@ -260,9 +260,9 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenBoard }) => {
                                   setEditingProject(project);
                                   setActiveMenuId(null);
                                 }}
-                                className="w-full text-left px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                className="w-full text-left px-3 py-2 text-black hover:bg-yellow-200 flex items-center gap-2 font-bold uppercase cursor-pointer"
                               >
-                                <Pencil className="w-3.5 h-3.5 text-slate-500" />
+                                <Pencil className="w-3.5 h-3.5 text-black" />
                                 Editar
                               </button>
                               {canManageProjects && (
@@ -271,7 +271,7 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenBoard }) => {
                                     handleDelete(project);
                                     setActiveMenuId(null);
                                   }}
-                                  className="w-full text-left px-3 py-2 text-rose-600 hover:bg-rose-50 flex items-center gap-2"
+                                  className="w-full text-left px-3 py-2 text-rose-700 hover:bg-rose-100 flex items-center gap-2 font-bold uppercase cursor-pointer"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                   Eliminar
@@ -283,35 +283,35 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenBoard }) => {
                       )}
                     </div>
 
-                    <h3 className="font-bold text-slate-900 text-lg group-hover:text-indigo-600 transition-colors leading-snug">
+                    <h3 className="font-black text-black text-lg group-hover:text-orange-600 transition-colors uppercase leading-snug">
                       {project.name}
                     </h3>
-                    <p className="text-slate-500 text-xs mt-1.5 line-clamp-2 leading-relaxed">
+                    <p className="text-neutral-700 text-xs mt-1.5 line-clamp-2 uppercase font-medium">
                       {project.description || 'Sin descripción detallada.'}
                     </p>
 
                     {/* Metrics snippet */}
-                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                    <div className="mt-4 pt-3 border-t-2 border-black flex items-center justify-between text-xs text-black font-bold uppercase">
                       <div className="flex items-center gap-1.5">
-                        <Kanban className="w-3.5 h-3.5 text-slate-400" />
+                        <Kanban className="w-3.5 h-3.5 stroke-[2.5]" />
                         <span>{projectTasks.length} tareas</span>
                       </div>
 
                       <div className="flex items-center gap-1.5">
-                        <Users className="w-3.5 h-3.5 text-slate-400" />
+                        <Users className="w-3.5 h-3.5 stroke-[2.5]" />
                         <span>{projectMembers.length} miembros</span>
                       </div>
                     </div>
 
                     {/* Progress bar */}
                     <div className="mt-3">
-                      <div className="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
+                      <div className="flex justify-between text-[11px] font-bold text-black uppercase mb-1">
                         <span>Progreso ({doneTasks.length}/{projectTasks.length})</span>
-                        <span className="font-semibold text-slate-700">{progress}%</span>
+                        <span className="font-black">{progress}%</span>
                       </div>
-                      <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                      <div className="w-full bg-neutral-200 h-3 border-2 border-black overflow-hidden">
                         <div
-                          className="bg-indigo-600 h-full rounded-full transition-all duration-300"
+                          className="bg-orange-500 h-full transition-all duration-300 border-r-2 border-black"
                           style={{ width: `${progress}%` }}
                         />
                       </div>
@@ -319,16 +319,16 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenBoard }) => {
                   </div>
 
                   {/* Footer Action */}
-                  <div className="px-5 py-3 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between">
+                  <div className="px-5 py-3 bg-neutral-100 border-t-2 border-black flex items-center justify-between">
                     {/* Member avatars */}
-                    <div className="flex -space-x-1.5 overflow-hidden">
+                    <div className="flex -space-x-1 overflow-hidden">
                       {projectMembers.slice(0, 4).map((m) => {
                         const u = users.find((usr) => usr.id === m.user_id);
                         return (
                           <div
                             key={m.id}
-                            className="inline-block h-6 w-6 rounded-full ring-2 ring-white text-[10px] font-bold text-white flex items-center justify-center shadow-inner"
-                            style={{ backgroundColor: u?.avatar_color || '#4A90D9' }}
+                            className="inline-block h-6 w-6 border border-black text-[10px] font-black text-black flex items-center justify-center"
+                            style={{ backgroundColor: u?.avatar_color || '#fbbf24' }}
                             title={`${u?.name} (${ROLE_LABELS[m.role]})`}
                           >
                             {u?.name.charAt(0)}
@@ -336,7 +336,7 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenBoard }) => {
                         );
                       })}
                       {projectMembers.length > 4 && (
-                        <div className="inline-block h-6 w-6 rounded-full bg-slate-200 ring-2 ring-white text-[10px] font-semibold text-slate-600 flex items-center justify-center">
+                        <div className="inline-block h-6 w-6 bg-black border border-black text-[10px] font-bold text-white flex items-center justify-center">
                           +{projectMembers.length - 4}
                         </div>
                       )}
@@ -347,10 +347,10 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenBoard }) => {
                         selectProject(project.id);
                         onOpenBoard(project.id);
                       }}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-2xs"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-yellow-400 hover:bg-yellow-300 border-2 border-black text-black text-xs font-black uppercase brutal-shadow-sm brutal-btn cursor-pointer"
                     >
-                      <Kanban className="w-3.5 h-3.5" />
-                      <span>Abrir Tablero</span>
+                      <Kanban className="w-3.5 h-3.5 stroke-[2.5]" />
+                      <span>ABRIR TABLERO</span>
                     </button>
                   </div>
                 </div>

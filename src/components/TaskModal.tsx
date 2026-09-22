@@ -305,20 +305,20 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   const taskAttachments = attachments.filter((a) => a.task_id === taskId);
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 font-mono">
+      <div className="bg-white border-4 border-black brutal-shadow-lg max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
+        <div className="px-6 py-4 border-b-2 border-black flex items-center justify-between bg-yellow-400">
           <div className="flex items-center gap-3">
-            <span className="font-mono text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-lg shadow-2xs">
-              {existingTask ? existingTask.task_key : 'NUEVA TAREA'}
+            <span className="font-mono text-xs font-black bg-black text-white px-2.5 py-1 border border-black uppercase">
+              {existingTask ? existingTask.task_key : 'NUEVA_TAREA'}
             </span>
-            <h2 className="text-base font-bold text-slate-900 tracking-tight truncate max-w-md">
-              {isEditing ? existingTask?.title : 'Crear Tarea en el Board'}
+            <h2 className="text-base font-black text-black tracking-wider truncate max-w-md uppercase">
+              {isEditing ? existingTask?.title : 'CREAR TAREA EN EL TABLERO'}
             </h2>
             {!isEditable && (
-              <span className="text-xs bg-slate-200/70 text-slate-700 px-2 py-0.5 rounded-md flex items-center gap-1 font-medium">
-                <Lock className="w-3 h-3" /> Solo lectura
+              <span className="text-xs bg-neutral-200 text-black border border-black px-2 py-0.5 flex items-center gap-1 font-bold uppercase">
+                <Lock className="w-3 h-3" /> SOLO LECTURA
               </span>
             )}
           </div>
@@ -328,60 +328,60 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               <button
                 type="button"
                 onClick={handleDelete}
-                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                className="p-1.5 bg-rose-200 hover:bg-rose-400 border border-black text-black transition-colors cursor-pointer"
                 title="Eliminar tarea"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-4 h-4 stroke-[2.5]" />
               </button>
             )}
             <button
               onClick={onClose}
-              className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-200/60 transition-colors"
+              className="text-black bg-white hover:bg-neutral-200 border border-black p-1.5 transition-colors cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 stroke-[3]" />
             </button>
           </div>
         </div>
 
         {/* Tab Selector if editing */}
         {isEditing && (
-          <div className="px-6 border-b border-slate-200 bg-white flex items-center gap-6 text-xs font-semibold">
+          <div className="px-6 border-b-2 border-black bg-neutral-100 flex items-center gap-3 text-xs font-black uppercase overflow-x-auto">
             <button
               type="button"
               onClick={() => setActiveTab('details')}
-              className={`py-3 border-b-2 transition-colors ${
+              className={`py-2.5 px-3 border-b-4 transition-all cursor-pointer ${
                 activeTab === 'details'
-                  ? 'border-indigo-600 text-indigo-600 font-bold'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
+                  ? 'border-black bg-white text-black font-black'
+                  : 'border-transparent text-neutral-600 hover:text-black'
               }`}
             >
-              Detalles
+              DETALLES
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab('comments')}
-              className={`py-3 border-b-2 transition-colors flex items-center gap-1.5 ${
+              className={`py-2.5 px-3 border-b-4 transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'comments'
-                  ? 'border-indigo-600 text-indigo-600 font-bold'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
+                  ? 'border-black bg-white text-black font-black'
+                  : 'border-transparent text-neutral-600 hover:text-black'
               }`}
             >
-              <MessageSquare className="w-3.5 h-3.5" />
-              Comentarios ({taskComments.length})
+              <MessageSquare className="w-3.5 h-3.5 stroke-[2.5]" />
+              COMENTARIOS ({taskComments.length})
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab('attachments')}
-              className={`py-3 border-b-2 transition-colors flex items-center gap-1.5 ${
+              className={`py-2.5 px-3 border-b-4 transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'attachments'
-                  ? 'border-indigo-600 text-indigo-600 font-bold'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
+                  ? 'border-black bg-white text-black font-black'
+                  : 'border-transparent text-neutral-600 hover:text-black'
               }`}
             >
-              <Paperclip className="w-3.5 h-3.5" />
-              Adjuntos ({taskAttachments.length})
+              <Paperclip className="w-3.5 h-3.5 stroke-[2.5]" />
+              ADJUNTOS ({taskAttachments.length})
             </button>
 
             <button
@@ -392,14 +392,14 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                   handleRunAudit();
                 }
               }}
-              className={`py-3 border-b-2 transition-colors flex items-center gap-1.5 ${
+              className={`py-2.5 px-3 border-b-4 transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'audit'
-                  ? 'border-indigo-600 text-indigo-600 font-bold'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
+                  ? 'border-black bg-orange-400 text-black font-black'
+                  : 'border-transparent text-neutral-600 hover:text-black'
               }`}
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Auditoría QA (Bedrock / NVIDIA)</span>
+              <ShieldCheck className="w-3.5 h-3.5 stroke-[3] text-black" />
+              <span>AUDITORÍA QA (BEDROCK/NIM)</span>
             </button>
           </div>
         )}
@@ -1060,12 +1060,12 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           )}
         </div>
 
-        {/* Modal Footer */}
-        <div className="px-6 py-3.5 border-t border-slate-200 bg-slate-50/80 flex items-center justify-between">
-          <div className="text-xs text-slate-500">
+          {/* Modal Footer */}
+        <div className="px-6 py-3.5 border-t-2 border-black bg-neutral-100 flex items-center justify-between">
+          <div className="text-xs text-neutral-600 font-bold uppercase">
             {existingTask && (
               <span>
-                Creado: {new Date(existingTask.created_at).toLocaleDateString()} | Actualizado:{' '}
+                CREADO: {new Date(existingTask.created_at).toLocaleDateString()} | ACTUALIZADO:{' '}
                 {new Date(existingTask.updated_at).toLocaleTimeString()}
               </span>
             )}
@@ -1075,17 +1075,17 @@ export const TaskModal: React.FC<TaskModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200/60 rounded-xl transition-colors"
+              className="px-4 py-2 text-xs font-black uppercase text-black bg-white hover:bg-neutral-200 border-2 border-black brutal-shadow-sm brutal-btn cursor-pointer"
             >
-              Cerrar
+              CERRAR
             </button>
             {isEditable && activeTab === 'details' && (
               <button
                 type="submit"
                 form="task-form"
-                className="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-colors shadow-2xs"
+                className="px-5 py-2 text-xs font-black uppercase text-black bg-orange-500 hover:bg-orange-400 border-2 border-black brutal-shadow brutal-btn cursor-pointer"
               >
-                {isEditing ? 'Guardar Cambios' : 'Crear Tarea'}
+                {isEditing ? 'GUARDAR CAMBIOS' : 'CREAR TAREA'}
               </button>
             )}
           </div>

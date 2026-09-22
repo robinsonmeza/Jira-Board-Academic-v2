@@ -195,75 +195,77 @@ export const BoardView: React.FC<BoardViewProps> = ({ onBackToProjects }) => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 font-mono">
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b-2 border-black">
         <div className="flex items-center gap-3">
           <button
             onClick={onBackToProjects}
-            className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-200/70 transition-colors border border-transparent hover:border-slate-300 shadow-2xs"
+            className="p-2 border-2 border-black bg-white hover:bg-neutral-200 text-black brutal-shadow-sm brutal-btn cursor-pointer transition-colors"
             title="Volver a lista de proyectos"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
           </button>
 
           <div>
             <div className="flex items-center gap-2">
-              <span className="bg-indigo-600 text-white font-mono text-xs font-bold px-2 py-0.5 rounded-md shadow-2xs">
-                {currentProject.key}
+              <span className="bg-orange-500 text-black border border-black font-mono text-xs font-black px-2 py-0.5 brutal-shadow-sm">
+                [{currentProject.key}]
               </span>
-              <h1 className="text-xl font-bold text-slate-900 tracking-tight">{currentProject.name}</h1>
+              <h1 className="text-xl font-black text-black uppercase tracking-wider">{currentProject.name}</h1>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">{currentProject.description || 'Tablero Ágil'}</p>
+            <p className="text-xs font-bold text-neutral-600 mt-0.5 uppercase tracking-wide">
+              {currentProject.description || 'TABLERO ÁGIL INDUSTRIAL'}
+            </p>
           </div>
         </div>
 
         {/* Navigation Tabs and Members action */}
         <div className="flex items-center gap-3">
-          <div className="bg-slate-200/80 p-1 rounded-xl flex items-center gap-1 text-xs font-semibold">
+          <div className="bg-white border-2 border-black p-1 flex items-center gap-1 text-xs font-black brutal-shadow-sm">
             <button
               onClick={() => setActiveTab('board')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+              className={`px-3 py-1.5 flex items-center gap-1.5 uppercase transition-all cursor-pointer ${
                 activeTab === 'board'
-                  ? 'bg-white text-indigo-600 shadow-2xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-yellow-400 text-black border border-black font-black'
+                  : 'text-neutral-700 hover:text-black hover:bg-neutral-100'
               }`}
             >
               <Kanban className="w-3.5 h-3.5" />
-              <span>Board</span>
+              <span>TABLERO</span>
             </button>
 
             <button
               onClick={() => setActiveTab('backlog')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+              className={`px-3 py-1.5 flex items-center gap-1.5 uppercase transition-all cursor-pointer ${
                 activeTab === 'backlog'
-                  ? 'bg-white text-indigo-600 shadow-2xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-yellow-400 text-black border border-black font-black'
+                  : 'text-neutral-700 hover:text-black hover:bg-neutral-100'
               }`}
             >
               <ListPlus className="w-3.5 h-3.5" />
-              <span>Backlog</span>
+              <span>BACKLOG</span>
             </button>
 
             <button
               onClick={() => setActiveTab('reports')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+              className={`px-3 py-1.5 flex items-center gap-1.5 uppercase transition-all cursor-pointer ${
                 activeTab === 'reports'
-                  ? 'bg-white text-indigo-600 shadow-2xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-yellow-400 text-black border border-black font-black'
+                  : 'text-neutral-700 hover:text-black hover:bg-neutral-100'
               }`}
             >
               <BarChart3 className="w-3.5 h-3.5" />
-              <span>Reportes</span>
+              <span>MÉTRICAS</span>
             </button>
           </div>
 
           <button
             onClick={() => setIsMembersModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-slate-300 hover:border-slate-400 text-slate-700 text-xs font-semibold rounded-xl shadow-2xs transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-cyan-300 hover:bg-cyan-200 text-black border-2 border-black text-xs font-black uppercase brutal-shadow-sm brutal-btn cursor-pointer"
           >
-            <Users className="w-4 h-4 text-indigo-600" />
-            <span>Miembros</span>
+            <Users className="w-4 h-4 stroke-[2.5]" />
+            <span>MIEMBROS</span>
           </button>
         </div>
       </div>
@@ -308,29 +310,29 @@ export const BoardView: React.FC<BoardViewProps> = ({ onBackToProjects }) => {
                     onDragOver={(e) => handleDragOver(e, col.id)}
                     onDragLeave={(e) => handleDragLeave(e, col.id)}
                     onDrop={(e) => handleDrop(e, col.id)}
-                    className={`w-72 bg-slate-200/60 rounded-xl border flex flex-col shrink-0 transition-all ${
+                    className={`w-80 bg-neutral-100 border-2 border-black flex flex-col shrink-0 transition-all ${
                       isDragOver
-                        ? 'border-indigo-500 bg-indigo-50/50 shadow-md ring-2 ring-indigo-400/20'
-                        : 'border-slate-300/80 shadow-2xs'
+                        ? 'bg-yellow-100 border-dashed border-black ring-4 ring-orange-400'
+                        : 'brutal-shadow'
                     }`}
                   >
                     {/* Column Header */}
                     <div
-                      className="px-3.5 py-2.5 border-b border-slate-300/70 rounded-t-xl flex items-center justify-between"
+                      className="px-3 py-2.5 border-b-2 border-black bg-white flex items-center justify-between"
                       style={{
-                        backgroundColor: col.color ? `${col.color}40` : undefined,
+                        borderTop: `6px solid ${col.color || '#ea580c'}`,
                       }}
                     >
                       <div className="flex items-center gap-2">
                         <span
-                          className="w-2.5 h-2.5 rounded-full"
-                          style={{ backgroundColor: col.color || '#4A90D9' }}
+                          className="w-3 h-3 border border-black"
+                          style={{ backgroundColor: col.color || '#ea580c' }}
                         />
-                        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                        <h3 className="text-xs font-black text-black uppercase tracking-wider">
                           {col.name}
                         </h3>
-                        <span className="bg-slate-300/80 text-slate-700 text-[11px] font-bold px-1.5 py-0.2 rounded-full">
-                          {colTasks.length}
+                        <span className="bg-black text-yellow-400 border border-black text-[11px] font-black px-1.5 py-0.2">
+                          [{colTasks.length}]
                         </span>
                       </div>
 
@@ -338,14 +340,14 @@ export const BoardView: React.FC<BoardViewProps> = ({ onBackToProjects }) => {
                         <div className="relative">
                           <button
                             onClick={() => setColumnMenuId(columnMenuId === col.id ? null : col.id)}
-                            className="p-1 text-slate-400 hover:text-slate-700 rounded hover:bg-black/5"
+                            className="p-1 text-black hover:bg-neutral-200 border border-transparent hover:border-black cursor-pointer"
                           >
                             <MoreVertical className="w-3.5 h-3.5" />
                           </button>
 
                           {columnMenuId === col.id && (
                             <div
-                              className="absolute right-0 mt-1 w-32 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-30 text-xs"
+                              className="absolute right-0 mt-1 w-36 bg-white border-2 border-black brutal-shadow-lg py-1 z-30 text-xs font-mono"
                               onMouseLeave={() => setColumnMenuId(null)}
                             >
                               <button
@@ -353,10 +355,10 @@ export const BoardView: React.FC<BoardViewProps> = ({ onBackToProjects }) => {
                                   handleRenameColumn(col);
                                   setColumnMenuId(null);
                                 }}
-                                className="w-full text-left px-3 py-1.5 text-slate-700 hover:bg-slate-50 flex items-center gap-1.5"
+                                className="w-full text-left px-3 py-1.5 font-bold uppercase text-black hover:bg-yellow-200 flex items-center gap-1.5 cursor-pointer"
                               >
                                 <Pencil className="w-3 h-3" />
-                                Renombrar
+                                RENOMBRAR
                               </button>
                               {projectColumns.length > 1 && (
                                 <button
@@ -364,10 +366,10 @@ export const BoardView: React.FC<BoardViewProps> = ({ onBackToProjects }) => {
                                     handleDeleteColumn(col);
                                     setColumnMenuId(null);
                                   }}
-                                  className="w-full text-left px-3 py-1.5 text-rose-600 hover:bg-rose-50 flex items-center gap-1.5"
+                                  className="w-full text-left px-3 py-1.5 font-bold uppercase text-rose-600 hover:bg-rose-100 flex items-center gap-1.5 cursor-pointer"
                                 >
                                   <Trash2 className="w-3 h-3" />
-                                  Eliminar
+                                  ELIMINAR
                                 </button>
                               )}
                             </div>
@@ -377,7 +379,7 @@ export const BoardView: React.FC<BoardViewProps> = ({ onBackToProjects }) => {
                     </div>
 
                     {/* Task Cards Container */}
-                    <div className="p-2.5 flex-1 flex flex-col gap-2 min-h-[160px] max-h-[calc(100vh-320px)] overflow-y-auto">
+                    <div className="p-2.5 flex-1 flex flex-col gap-2.5 min-h-[160px] max-h-[calc(100vh-320px)] overflow-y-auto bg-neutral-100">
                       {colTasks.map((task) => (
                         <TaskCard
                           key={task.id}
@@ -388,21 +390,23 @@ export const BoardView: React.FC<BoardViewProps> = ({ onBackToProjects }) => {
                       ))}
 
                       {colTasks.length === 0 && (
-                        <div className="flex-1 border-2 border-dashed border-slate-300/60 rounded-lg flex items-center justify-center p-4 text-center">
-                          <span className="text-[11px] text-slate-400">Arrastra tareas aquí</span>
+                        <div className="flex-1 border-2 border-dashed border-neutral-400 flex items-center justify-center p-4 text-center bg-white/50">
+                          <span className="text-[11px] font-bold text-neutral-500 uppercase">
+                            [ VACÍO - ARRASTRAR AQUÍ ]
+                          </span>
                         </div>
                       )}
                     </div>
 
                     {/* Add task button in column */}
                     {hasPerm('manage_tasks') && (
-                      <div className="p-2 border-t border-slate-300/50 bg-slate-100/50 rounded-b-xl">
+                      <div className="p-2 border-t-2 border-black bg-white">
                         <button
                           onClick={() => handleOpenCreateTask(col.id)}
-                          className="w-full py-1.5 px-2 rounded-lg border border-transparent hover:border-slate-300 hover:bg-white text-slate-600 hover:text-indigo-600 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-2xs"
+                          className="w-full py-1.5 px-2 border-2 border-black bg-white hover:bg-yellow-300 text-black text-xs font-black uppercase flex items-center justify-center gap-1.5 transition-all brutal-shadow-sm brutal-btn cursor-pointer"
                         >
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>Crear Tarea</span>
+                          <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                          <span>+ AGREGAR TAREA</span>
                         </button>
                       </div>
                     )}
@@ -414,10 +418,10 @@ export const BoardView: React.FC<BoardViewProps> = ({ onBackToProjects }) => {
               {hasPerm('manage_columns') && (
                 <button
                   onClick={() => setIsAddColumnModalOpen(true)}
-                  className="w-60 h-36 border-2 border-dashed border-slate-300 hover:border-indigo-500 rounded-xl flex flex-col items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/20 transition-all shrink-0 p-4"
+                  className="w-64 h-36 border-2 border-dashed border-black bg-white hover:bg-yellow-100 flex flex-col items-center justify-center text-black transition-all shrink-0 p-4 brutal-shadow cursor-pointer"
                 >
-                  <Plus className="w-6 h-6 mb-1" />
-                  <span className="text-xs font-bold">Agregar Columna</span>
+                  <Plus className="w-6 h-6 mb-1 stroke-[3]" />
+                  <span className="text-xs font-black uppercase tracking-wider">+ NUEVA COLUMNA</span>
                 </button>
               )}
             </div>

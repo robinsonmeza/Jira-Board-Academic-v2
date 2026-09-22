@@ -40,60 +40,64 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, setCurrentView }) =
   const [showManageUsersModal, setShowManageUsersModal] = useState(false);
 
   return (
-    <header className="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-40 shadow-sm">
+    <header className="bg-black border-b-4 border-black text-white sticky top-0 z-40 brutal-shadow font-mono">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Brand & Project Selector */}
         <div className="flex items-center gap-6">
           <button
             onClick={() => setCurrentView('projects')}
-            className="flex items-center gap-2.5 text-white hover:text-indigo-400 transition-colors font-bold text-lg tracking-tight group"
+            className="flex items-center gap-2.5 text-white hover:text-orange-400 transition-colors font-black text-lg tracking-wider group cursor-pointer"
           >
-            <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/25 group-hover:bg-indigo-500 transition-all">
-              <Kanban className="w-5 h-5" />
+            <div className="w-10 h-10 bg-orange-500 border-2 border-white flex items-center justify-center text-black font-black brutal-shadow-sm group-hover:bg-yellow-400 transition-all">
+              <Kanban className="w-6 h-6 stroke-[2.5]" />
             </div>
-            <span className="font-bold tracking-tight">Jira Board</span>
+            <div className="text-left">
+              <span className="font-black tracking-widest uppercase text-base block">JIRA_RAW</span>
+              <span className="text-[9px] text-orange-400 tracking-tighter block -mt-1 font-bold">USB AGILE CORE</span>
+            </div>
           </button>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1.5">
+          <nav className="hidden md:flex items-center gap-2">
             <button
               onClick={() => setCurrentView('projects')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2 ${
+              className={`px-3 py-1.5 border-2 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
                 currentView === 'projects'
-                  ? 'bg-slate-800 text-indigo-400 border border-slate-700 shadow-2xs'
-                  : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                  ? 'bg-orange-500 text-black border-black brutal-shadow-sm'
+                  : 'bg-neutral-900 text-neutral-300 border-neutral-700 hover:border-white hover:text-white'
               }`}
             >
               <FolderKanban className="w-4 h-4" />
-              Proyectos
+              PROYECTOS
             </button>
 
             {currentProject && (
               <div className="relative">
                 <button
                   onClick={() => setShowProjectDropdown(!showProjectDropdown)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2 ${
+                  className={`px-3 py-1.5 border-2 text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${
                     currentView === 'board'
-                      ? 'bg-slate-800 text-indigo-400 border border-slate-700 shadow-2xs'
-                      : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                      ? 'bg-yellow-400 text-black border-black brutal-shadow-sm'
+                      : 'bg-neutral-900 text-neutral-300 border-neutral-700 hover:border-white hover:text-white'
                   }`}
                 >
-                  <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] px-2 py-0.5 rounded font-mono font-bold">
-                    {currentProject.key}
+                  <span className="bg-black text-yellow-400 border border-black text-[11px] px-1.5 py-0.2 font-mono font-black">
+                    [{currentProject.key}]
                   </span>
                   <span className="truncate max-w-[140px]">{currentProject.name}</span>
-                  <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+                  <ChevronDown className="w-3.5 h-3.5" />
                 </button>
 
                 {showProjectDropdown && (
                   <div
-                    className="absolute left-0 mt-2 w-64 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100"
+                    className="absolute left-0 mt-2 w-72 bg-neutral-950 border-4 border-black brutal-shadow-lg py-2 z-50 animate-in fade-in zoom-in-95 duration-100"
                     onMouseLeave={() => setShowProjectDropdown(false)}
                   >
-                    <div className="px-3.5 py-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-800">
-                      Cambiar Proyecto
+                    <div className="px-3.5 py-2 text-[10px] font-black text-neutral-400 uppercase tracking-widest border-b-2 border-neutral-800 flex items-center justify-between">
+                      <span>SELECCIONAR PROYECTO</span>
+                      <span className="text-orange-500">[{projects.length}]</span>
                     </div>
-                    <div className="p-1 space-y-0.5">
+                    <div className="p-1 space-y-1">
                       {projects.map((p) => (
                         <button
                           key={p.id}
@@ -102,14 +106,16 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, setCurrentView }) =
                             setCurrentView('board');
                             setShowProjectDropdown(false);
                           }}
-                          className={`w-full text-left px-3 py-2 text-xs rounded-lg flex items-center gap-2.5 hover:bg-slate-800 transition-colors ${
-                            p.id === currentProject?.id ? 'text-indigo-400 bg-slate-800/80 font-bold' : 'text-slate-200'
+                          className={`w-full text-left px-3 py-2 text-xs border-2 flex items-center gap-2.5 transition-colors cursor-pointer ${
+                            p.id === currentProject?.id
+                              ? 'bg-orange-500 text-black border-black font-bold'
+                              : 'bg-neutral-900 text-neutral-200 border-neutral-800 hover:border-neutral-500 hover:bg-neutral-800'
                           }`}
                         >
-                          <span className="bg-slate-950 text-slate-300 text-[11px] px-1.5 py-0.5 rounded font-mono font-semibold border border-slate-800">
+                          <span className="bg-black text-orange-400 text-[11px] px-1.5 py-0.5 font-mono font-bold border border-neutral-700">
                             {p.key}
                           </span>
-                          <span className="truncate">{p.name}</span>
+                          <span className="truncate uppercase font-bold">{p.name}</span>
                         </button>
                       ))}
                     </div>
@@ -125,45 +131,38 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, setCurrentView }) =
           <div className="flex items-center gap-3">
             {/* Realtime Cloud Sync Status */}
             <div
-              className={`hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${
+              className={`hidden md:inline-flex items-center gap-2 px-3 py-1 text-[11px] font-bold uppercase tracking-wider border-2 ${
                 isSyncing
-                  ? 'bg-indigo-950/80 text-indigo-300 border-indigo-700/60'
+                  ? 'bg-neutral-900 text-orange-400 border-orange-500 animate-pulse'
                   : isCloudConnected
-                  ? 'bg-emerald-950/70 text-emerald-300 border-emerald-800/60'
-                  : 'bg-amber-950/70 text-amber-300 border-amber-800/60'
+                  ? 'bg-emerald-400 text-black border-black brutal-shadow-sm'
+                  : 'bg-neutral-800 text-neutral-300 border-neutral-600'
               }`}
-              title={
-                isSyncing
-                  ? 'Sincronizando cambios con la nube Firebase...'
-                  : isCloudConnected
-                  ? 'Conectado a Firebase Cloud Firestore (Colaboración en tiempo real activa)'
-                  : 'Modo local activo'
-              }
             >
               {isSyncing ? (
-                <RefreshCw className="w-3 h-3 text-indigo-400 animate-spin" />
+                <RefreshCw className="w-3.5 h-3.5 text-orange-400 animate-spin" />
               ) : isCloudConnected ? (
-                <Cloud className="w-3 h-3 text-emerald-400" />
+                <Cloud className="w-3.5 h-3.5 text-black" />
               ) : (
-                <CloudOff className="w-3 h-3 text-amber-400" />
+                <CloudOff className="w-3.5 h-3.5 text-neutral-400" />
               )}
-              <span>{isSyncing ? 'Guardando...' : isCloudConnected ? 'Cloud Activo' : 'Offline'}</span>
+              <span>{isSyncing ? 'SYNC' : isCloudConnected ? 'CLOUD: ON' : 'LOCAL'}</span>
             </div>
 
             {/* Project Manager Admin Button */}
             {currentUser.is_admin && (
               <button
                 onClick={() => setShowManageUsersModal(true)}
-                className="hidden sm:inline-flex items-center gap-1.5 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-semibold px-2.5 py-1 rounded-lg shadow-2xs transition-colors"
+                className="hidden sm:inline-flex items-center gap-1.5 bg-yellow-400 hover:bg-yellow-300 text-black border-2 border-black brutal-shadow-sm text-xs font-black uppercase px-3 py-1 transition-all cursor-pointer brutal-btn"
                 title="Administrar y editar usuarios del sistema"
               >
-                <UserCog className="w-3.5 h-3.5 text-amber-400" />
-                <span>Gestionar Usuarios</span>
+                <UserCog className="w-4 h-4 text-black" />
+                <span>USUARIOS</span>
               </button>
             )}
             {!currentUser.is_admin && currentProject && (
-              <span className="hidden sm:inline-flex items-center gap-1.5 bg-slate-800/80 text-slate-300 border border-slate-700 text-xs px-2.5 py-1 rounded-full font-medium">
-                Rol: <strong className="text-indigo-400 font-semibold">{ROLE_LABELS[currentRole]}</strong>
+              <span className="hidden sm:inline-flex items-center gap-1.5 bg-neutral-900 text-neutral-300 border-2 border-neutral-700 text-xs px-2.5 py-1 font-bold uppercase">
+                ROL: <strong className="text-orange-400">{ROLE_LABELS[currentRole]}</strong>
               </span>
             )}
 
@@ -171,49 +170,49 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, setCurrentView }) =
             <div className="relative">
               <button
                 onClick={() => setShowUserDropdown(!showUserDropdown)}
-                className="flex items-center gap-2.5 p-1 pr-3 rounded-full hover:bg-slate-800 transition-colors border border-slate-700 bg-slate-950/60 shadow-2xs"
+                className="flex items-center gap-2 p-1 pr-3 border-2 border-black bg-neutral-900 hover:bg-neutral-800 transition-colors brutal-shadow-sm cursor-pointer"
               >
                 <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-inner ring-1 ring-white/20"
-                  style={{ backgroundColor: currentUser.avatar_color }}
+                  className="w-7 h-7 flex items-center justify-center text-black text-xs font-black border border-black"
+                  style={{ backgroundColor: currentUser.avatar_color || '#ea580c' }}
                 >
                   {currentUser.name.charAt(0)}
                 </div>
                 <div className="text-left hidden lg:block">
-                  <div className="text-xs font-semibold leading-tight text-slate-100">{currentUser.name}</div>
-                  <div className="text-[10px] text-slate-400 font-mono">@{currentUser.username}</div>
+                  <div className="text-xs font-black leading-tight text-white uppercase">{currentUser.name}</div>
+                  <div className="text-[10px] text-orange-400 font-mono">@{currentUser.username}</div>
                 </div>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
               </button>
 
               {showUserDropdown && (
                 <div
-                  className="absolute right-0 mt-2 w-72 bg-slate-900 border border-slate-700/90 rounded-2xl shadow-2xl py-2 z-50 text-slate-200"
+                  className="absolute right-0 mt-2 w-72 bg-neutral-950 border-4 border-black brutal-shadow-lg p-2 z-50 text-neutral-200"
                   onMouseLeave={() => setShowUserDropdown(false)}
                 >
-                  <div className="px-4 py-3 border-b border-slate-800">
-                    <div className="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">Sesión activa</div>
-                    <div className="font-bold text-white text-sm mt-0.5">{currentUser.name}</div>
-                    <div className="text-xs text-slate-400 font-mono">@{currentUser.username}</div>
-                    <div className="text-[11px] text-slate-400 truncate mt-0.5">{currentUser.email}</div>
+                  <div className="p-3 border-b-2 border-neutral-800 bg-black">
+                    <div className="text-[9px] text-neutral-400 uppercase font-bold tracking-widest">PERFIL OPERADOR</div>
+                    <div className="font-black text-white text-sm uppercase mt-0.5">{currentUser.name}</div>
+                    <div className="text-xs text-orange-400 font-mono">@{currentUser.username}</div>
+                    <div className="text-[11px] text-neutral-400 truncate mt-0.5">{currentUser.email}</div>
                     <div className="mt-2">
-                      <span className="inline-flex items-center gap-1 text-[11px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-md font-semibold">
-                        Rol: {ROLE_LABELS[currentRole]}
+                      <span className="inline-block text-[10px] bg-yellow-400 text-black border border-black px-2 py-0.5 font-black uppercase">
+                        ROL: {ROLE_LABELS[currentRole]}
                       </span>
                     </div>
                   </div>
 
-                  <div className="pt-1.5 px-1">
+                  <div className="pt-2 space-y-1">
                     {currentUser.is_admin && (
                       <button
                         onClick={() => {
                           setShowManageUsersModal(true);
                           setShowUserDropdown(false);
                         }}
-                        className="w-full text-left px-3 py-2 text-xs text-amber-300 hover:bg-slate-800/80 rounded-lg flex items-center gap-2 transition-colors font-medium"
+                        className="w-full text-left px-3 py-2 text-xs text-yellow-400 hover:bg-neutral-900 border border-transparent hover:border-yellow-400 flex items-center gap-2 transition-colors font-bold uppercase cursor-pointer"
                       >
-                        <UserCog className="w-3.5 h-3.5 text-amber-400" />
-                        Administrar Usuarios & Permisos
+                        <UserCog className="w-4 h-4 text-yellow-400" />
+                        GESTIONAR USUARIOS
                       </button>
                     )}
                     <button
@@ -221,10 +220,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, setCurrentView }) =
                         logout();
                         setShowUserDropdown(false);
                       }}
-                      className="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-slate-800/80 rounded-lg flex items-center gap-2 transition-colors font-medium"
+                      className="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-neutral-900 border border-transparent hover:border-rose-400 flex items-center gap-2 transition-colors font-bold uppercase cursor-pointer"
                     >
-                      <LogOut className="w-3.5 h-3.5" />
-                      Cerrar Sesión
+                      <LogOut className="w-4 h-4" />
+                      CERRAR SESIÓN
                     </button>
                   </div>
                 </div>

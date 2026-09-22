@@ -79,15 +79,17 @@ export const AcademicChatbot: React.FC = () => {
   const initialGreeting: ChatMessage = {
     id: 'msg-welcome',
     role: 'assistant',
-    content: `👋 **¡Hola ${currentUser?.name || 'estudiante'}!** Soy **ScrumBot**, tu tutor académico virtual de Metodologías Ágiles y Jira.
+    content: `👋 **¡Hola ${currentUser?.name || 'estudiante'}!** Soy **ScrumBot**, tu tutor pedagógico de Metodologías Ágiles (Scrum/Kanban) e Ingeniería de Software.
 
-Estoy aquí para apoyarte en:
-- 📝 **Estructurar y redactar Historias de Usuario (HU)** con formato *INVEST* y criterios de aceptación.
-- 💡 **Aclarar conceptos de Scrum**: Sprints, Story Points, Definition of Done, Backlog.
-- 👥 **Definir roles**: Product Owner, Frontend, Backend y Project Manager.
+Fui concebido y desarrollado como un esfuerzo del futuro ingeniero de sistemas **Robinson Meza**, con el propósito de que sus futuros colegas salgan de la mediocridad y alcancen los más altos niveles de excelencia profesional y técnica que se han venido perdiendo, en apoyo a los docentes de la **Universidad Simón Bolívar**.
+
+Mi labor está enfocada exclusivamente en guiarte en:
+- 📝 **Estructurar y redactar Historias de Usuario (HU)** con formato canónico (*Como / Quiero / Para*), criterios BDD e *INVEST*.
+- 💡 **Dominar conceptos de Scrum**: Sprints, Story Points en Fibonacci, Definition of Done (DoD) y gestión de Backlog.
+- 👥 **Roles de equipo**: Product Owner, Frontend Developer, Backend Developer y QA.
 - 🎯 **Contextualizar tareas** para tu proyecto actual: **${currentProject?.name || 'General'}** (${currentProject?.key || 'PRJ'}).
 
-Puedes hacerme cualquier pregunta o seleccionar una de las sugerencias rápidas abajo. ¡Disminuyamos dudas y avancemos con tu sprint!`,
+¿En qué historia de usuario o tarea de tu Sprint trabajaremos hoy?`,
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   };
 
@@ -222,22 +224,21 @@ Puedes hacerme cualquier pregunta o seleccionar una de las sugerencias rápidas 
     <>
       {/* Floating Launcher Trigger */}
       {!isOpen && (
-        <div className="fixed bottom-5 right-5 z-40 flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 bg-slate-900 text-white px-3 py-1.5 rounded-full text-xs font-medium shadow-md border border-slate-700 animate-in fade-in slide-in-from-right-4 duration-300">
-            <GraduationCap className="w-4 h-4 text-indigo-400" />
-            <span>Tutor Scrum & Historias de Usuario</span>
+        <div className="fixed bottom-5 right-5 z-40 flex items-center gap-3 font-mono">
+          <div className="hidden sm:flex items-center gap-2 bg-yellow-400 text-black px-3 py-1.5 border-2 border-black text-xs font-black brutal-shadow-sm uppercase">
+            <GraduationCap className="w-4 h-4 text-black stroke-[2.5]" />
+            <span>SCRUMBOT PEDAGÓGICO</span>
           </div>
 
           <button
             onClick={() => setIsOpen(true)}
-            className="relative bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white p-3.5 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200 flex items-center justify-center border-2 border-indigo-400/40 focus:outline-hidden focus:ring-4 focus:ring-indigo-500/30 group"
+            className="relative bg-orange-500 hover:bg-orange-400 text-black p-3.5 border-4 border-black brutal-shadow hover:brutal-shadow-sm transition-all flex items-center justify-center cursor-pointer"
             aria-label="Abrir Asistente Scrum y Guía de Historias"
             title="Abrir Asistente Scrum y Guía de Historias de Usuario"
           >
-            <Bot className="w-6 h-6 group-hover:rotate-6 transition-transform" />
+            <Bot className="w-7 h-7 stroke-[2.5]" />
             <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-slate-900" />
+              <span className="relative inline-flex h-3.5 w-3.5 bg-black border border-white" />
             </span>
           </button>
         </div>
@@ -246,69 +247,69 @@ Puedes hacerme cualquier pregunta o seleccionar una de las sugerencias rápidas 
       {/* Main Chat Window */}
       {isOpen && (
         <div
-          className={`fixed z-50 bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden transition-all duration-200 animate-in fade-in zoom-in-95 ${
+          className={`fixed z-50 bg-white border-4 border-black brutal-shadow-lg flex flex-col overflow-hidden transition-all duration-200 font-mono ${
             isExpanded
               ? 'inset-4 sm:inset-10'
-              : 'bottom-5 right-5 w-[94vw] sm:w-[460px] h-[640px] max-h-[85vh]'
+              : 'bottom-5 right-5 w-[94vw] sm:w-[480px] h-[640px] max-h-[85vh]'
           }`}
         >
           {/* Header */}
-          <div className="bg-slate-900 px-4 py-3.5 border-b border-slate-800 text-white flex items-center justify-between shrink-0">
+          <div className="bg-yellow-400 px-4 py-3 border-b-2 border-black text-black flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
-                <Bot className="w-5 h-5" />
+              <div className="w-9 h-9 bg-black border border-black flex items-center justify-center text-white">
+                <Bot className="w-5 h-5 stroke-[2.5]" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold text-white tracking-tight">ScrumBot Tutor</h3>
-                  <span className="bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 text-[10px] font-semibold px-1.5 py-0.2 rounded-sm" title="Motor Primario: Amazon Bedrock | Motor Secundario: NVIDIA NIM">
-                    Bedrock + NVIDIA
+                  <h3 className="text-sm font-black text-black tracking-wider uppercase">SCRUMBOT TUTOR</h3>
+                  <span className="bg-black text-white text-[9px] font-black px-1.5 py-0.2 uppercase" title="Motor Primario: Amazon Bedrock | Motor Secundario: NVIDIA NIM">
+                    BEDROCK + NIM
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-                  <span>Guía de Historias de Usuario & Definiciones</span>
+                <p className="text-[10px] font-bold text-neutral-800 uppercase flex items-center gap-1.5">
+                  <span className="w-2 h-2 bg-emerald-600 inline-block border border-black" />
+                  <span>METODOLOGÍAS ÁGILES • UNIV. SIMÓN BOLÍVAR</span>
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-1 text-slate-400">
+            <div className="flex items-center gap-1">
               <button
                 onClick={handleResetChat}
-                className="p-1.5 rounded-lg hover:bg-slate-800 hover:text-slate-200 transition-colors"
+                className="p-1.5 border border-black bg-white hover:bg-neutral-200 text-black transition-colors cursor-pointer"
                 title="Reiniciar conversación"
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="w-4 h-4 stroke-[2.5]" />
               </button>
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="p-1.5 rounded-lg hover:bg-slate-800 hover:text-slate-200 transition-colors"
+                className="p-1.5 border border-black bg-white hover:bg-neutral-200 text-black transition-colors cursor-pointer"
                 title={isExpanded ? 'Contraer' : 'Expandir ventana'}
               >
-                {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                {isExpanded ? <Minimize2 className="w-4 h-4 stroke-[2.5]" /> : <Maximize2 className="w-4 h-4 stroke-[2.5]" />}
               </button>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors"
+                className="p-1.5 border border-black bg-white hover:bg-neutral-200 text-black transition-colors cursor-pointer"
                 title="Cerrar chat"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 stroke-[3]" />
               </button>
             </div>
           </div>
 
           {/* Project Context Badge Strip */}
           {currentProject && (
-            <div className="bg-indigo-50/70 border-b border-indigo-100/80 px-4 py-1.5 flex items-center justify-between text-xs text-indigo-900 shrink-0">
+            <div className="bg-neutral-100 border-b-2 border-black px-4 py-1.5 flex items-center justify-between text-xs text-black shrink-0">
               <div className="flex items-center gap-1.5 truncate">
-                <BookOpen className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                <span className="font-semibold text-slate-700">Contexto:</span>
-                <span className="font-mono font-bold text-indigo-700">[{currentProject.key}]</span>
-                <span className="truncate">{currentProject.name}</span>
+                <BookOpen className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span className="font-bold">CONTEXTO:</span>
+                <span className="bg-yellow-300 border border-black px-1 font-black">[{currentProject.key}]</span>
+                <span className="truncate uppercase font-bold">{currentProject.name}</span>
               </div>
               {activeSprint && (
-                <span className="bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded text-[10px] shrink-0 ml-2">
-                  Sprint Activo
+                <span className="bg-emerald-300 border border-black text-black font-black px-2 py-0.5 text-[10px] shrink-0 ml-2 uppercase">
+                  SPRINT_ACTIVO
                 </span>
               )}
             </div>

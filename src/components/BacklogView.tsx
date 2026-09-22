@@ -30,6 +30,7 @@ export const BacklogView: React.FC<BacklogViewProps> = ({ onOpenTaskModal, tasks
   if (!currentProject) return null;
 
   const projectSprints = sprints.filter((s) => s.project_id === currentProject.id);
+  const activeSprints = projectSprints.filter((s) => s.status === 'active' || s.status === 'planned');
   const activeSprint = projectSprints.find((s) => s.status === 'active');
   const plannedSprints = projectSprints.filter((s) => s.status === 'planned');
 
@@ -80,17 +81,17 @@ export const BacklogView: React.FC<BacklogViewProps> = ({ onOpenTaskModal, tasks
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+    <div className="bg-white border-4 border-black brutal-shadow overflow-hidden font-mono">
       {/* Header */}
-      <div className="px-6 py-4 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
+      <div className="px-6 py-4 bg-yellow-400 border-b-2 border-black flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-200/80 text-indigo-700 flex items-center justify-center font-bold shadow-2xs">
-            <ListPlus className="w-5 h-5" />
+          <div className="w-9 h-9 bg-black border-2 border-black text-white flex items-center justify-center font-bold">
+            <ListPlus className="w-5 h-5 stroke-[2.5]" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-slate-900 tracking-tight">Backlog del Producto</h2>
-            <p className="text-xs text-slate-500">
-              {backlogTasks.length} tareas pendientes de planificar o ingresar al sprint.
+            <h2 className="text-sm font-black text-black tracking-wider uppercase">BACKLOG DEL PRODUCTO</h2>
+            <p className="text-xs font-bold text-neutral-800 uppercase">
+              {backlogTasks.length} TAREAS PENDIENTES DE PLANIFICACIÓN EN SPRINT.
             </p>
           </div>
         </div>
@@ -98,154 +99,98 @@ export const BacklogView: React.FC<BacklogViewProps> = ({ onOpenTaskModal, tasks
         {hasPerm('manage_tasks') && (
           <button
             onClick={() => onOpenTaskModal(null, null)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition-colors shadow-2xs"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-orange-500 hover:bg-orange-400 text-black border-2 border-black text-xs font-black uppercase brutal-shadow-sm brutal-btn cursor-pointer"
           >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Crear Tarea en Backlog</span>
+            <Plus className="w-3.5 h-3.5 stroke-[3]" />
+            <span>+ CREAR TAREA BACKLOG</span>
           </button>
         )}
       </div>
 
       {/* Table List */}
       {backlogTasks.length === 0 ? (
-        <div className="p-12 text-center text-slate-400 text-sm">
-          <Layers className="w-10 h-10 mx-auto text-slate-300 mb-2" />
-          <p className="font-medium text-slate-500">No hay tareas en el Backlog actualmente.</p>
+        <div className="p-12 text-center text-neutral-500 text-xs font-bold uppercase">
+          <Layers className="w-10 h-10 mx-auto text-neutral-400 mb-2 stroke-[2]" />
+          <p>NO HAY TAREAS EN EL BACKLOG ACTUALMENTE.</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50/80 border-b border-slate-200 text-slate-600 uppercase font-bold text-[11px] tracking-wider">
+            <thead className="bg-neutral-100 border-b-2 border-black text-black uppercase font-black text-[11px] tracking-wider">
               <tr>
-                <th className="px-4 py-3.5">Tipo / Clave</th>
-                <th className="px-4 py-3.5">Título</th>
-                <th className="px-4 py-3.5">Prioridad</th>
-                <th className="px-4 py-3.5">Story Points</th>
-                <th className="px-4 py-3.5">Asignado</th>
-                <th className="px-4 py-3.5">Fecha Límite</th>
-                <th className="px-4 py-3.5 text-right">Asignar a Sprint</th>
+                <th className="px-4 py-3.5 border-r border-black">Tipo / Clave</th>
+                <th className="px-4 py-3.5 border-r border-black">Título</th>
+                <th className="px-4 py-3.5 border-r border-black">Prioridad</th>
+                <th className="px-4 py-3.5 border-r border-black">SP</th>
+                <th className="px-4 py-3.5 border-r border-black">Asignados</th>
+                <th className="px-4 py-3.5 text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y-2 divide-neutral-200">
               {backlogTasks.map((task) => {
-                const assigneeIds = getTaskAssigneeIds(task);
-                const assignedUsers = assigneeIds.map((id) => users.find((u) => u.id === id)).filter(Boolean);
+                const assignedUsers = getTaskAssigneeIds(task)
+                  .map((id) => users.find((u) => u.id === id))
+                  .filter(Boolean);
+
                 return (
                   <tr
                     key={task.id}
-                    className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
-                    onClick={() => onOpenTaskModal(task.id)}
+                    onClick={() => onOpenTaskModal(task.id, null)}
+                    className="hover:bg-yellow-50 cursor-pointer transition-colors"
                   >
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2 font-mono font-bold text-slate-600 text-xs">
+                    <td className="px-4 py-3 border-r border-neutral-200 font-mono font-bold">
+                      <div className="flex items-center gap-2">
                         {renderTypeIcon(task.task_type)}
-                        <span className="group-hover:text-indigo-600 transition-colors">{task.task_key}</span>
+                        <span className="bg-neutral-200 border border-black px-1 text-[11px]">{task.task_key}</span>
                       </div>
                     </td>
-
-                    <td className="px-4 py-3 font-semibold text-slate-800">
-                      <div className="max-w-md truncate">{task.title}</div>
-                      {task.labels && task.labels.length > 0 && (
-                        <div className="flex gap-1 mt-1">
-                          {task.labels.map((l) => (
-                            <span key={l} className="text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200/60 px-1.5 py-0.2 rounded-md">
-                              {l}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                    <td className="px-4 py-3 border-r border-neutral-200 font-bold uppercase text-black max-w-xs truncate">
+                      {task.title}
                     </td>
-
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-1.5 capitalize text-slate-600 font-medium">
-                        {renderPriority(task.priority)}
-                        <span>{task.priority}</span>
-                      </div>
-                    </td>
-
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-4 py-3 border-r border-neutral-200">{renderPriority(task.priority)}</td>
+                    <td className="px-4 py-3 border-r border-neutral-200 font-bold">
                       {task.story_points !== null ? (
-                        <span className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-indigo-50 border border-indigo-200/80 text-indigo-700 font-bold text-[10px]">
+                        <span className="w-5 h-5 bg-orange-400 border border-black text-black text-[10px] font-black inline-flex items-center justify-center">
                           {task.story_points}
                         </span>
                       ) : (
-                        <span className="text-slate-400">-</span>
+                        '-'
                       )}
                     </td>
-
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      {assignedUsers.length > 0 ? (
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center -space-x-1.5 overflow-hidden">
-                            {assignedUsers.slice(0, 3).map((u) => u && (
-                              <span
-                                key={u.id}
-                                className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-2xs ring-1 ring-white"
-                                style={{ backgroundColor: u.avatar_color }}
-                                title={u.name}
-                              >
-                                {u.name.charAt(0).toUpperCase()}
-                              </span>
-                            ))}
-                            {assignedUsers.length > 3 && (
-                              <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[9px] font-bold flex items-center justify-center ring-1 ring-white">
-                                +{assignedUsers.length - 3}
-                              </span>
-                            )}
+                    <td className="px-4 py-3 border-r border-neutral-200">
+                      <div className="flex -space-x-1">
+                        {assignedUsers.slice(0, 3).map((u) => u && (
+                          <div
+                            key={u.id}
+                            className="w-5 h-5 flex items-center justify-center text-[10px] text-black font-black border border-black"
+                            style={{ backgroundColor: u.avatar_color || '#fbbf24' }}
+                            title={u.name}
+                          >
+                            {u.name.charAt(0).toUpperCase()}
                           </div>
-                          <span className="text-slate-700 font-medium text-xs max-w-[140px] truncate" title={assignedUsers.map((u) => u?.name).join(', ')}>
-                            {assignedUsers.map((u) => u?.name).join(', ')}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-slate-400 italic">Sin asignar</span>
-                      )}
+                        ))}
+                      </div>
                     </td>
-
-                    <td className="px-4 py-3 whitespace-nowrap text-slate-500 font-medium">
-                      {task.due_date ? (
-                        <span className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                          {task.due_date}
-                        </span>
-                      ) : (
-                        <span className="text-slate-400">-</span>
-                      )}
-                    </td>
-
-                    <td className="px-4 py-3 whitespace-nowrap text-right" onClick={(e) => e.stopPropagation()}>
-                      {hasPerm('manage_sprints') && (
-                        <div className="inline-flex items-center gap-1">
-                          {activeSprint && (
-                            <button
-                              onClick={() => moveToSprint(task.id, activeSprint.id)}
-                              className="px-2.5 py-1 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200/80 rounded-lg font-semibold text-[11px] flex items-center gap-1 transition-colors shadow-2xs"
-                              title={`Mover a ${activeSprint.name}`}
-                            >
-                              <span>{activeSprint.name}</span>
-                              <ArrowRight className="w-3 h-3" />
-                            </button>
-                          )}
-
-                          {plannedSprints.length > 0 && !activeSprint && (
-                            <select
-                              onChange={(e) => {
-                                if (e.target.value) moveToSprint(task.id, Number(e.target.value));
-                              }}
-                              defaultValue=""
-                              className="px-2.5 py-1 bg-white border border-slate-300 rounded-lg text-[11px] font-semibold text-slate-700 outline-none shadow-2xs"
-                            >
-                              <option value="" disabled>
-                                Asignar a...
-                              </option>
-                              {plannedSprints.map((s) => (
-                                <option key={s.id} value={s.id}>
-                                  {s.name}
-                                </option>
-                              ))}
-                            </select>
-                          )}
-                        </div>
+                    <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                      {activeSprints.length > 0 && hasPerm('manage_tasks') && (
+                        <select
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              moveToSprint(task.id, Number(e.target.value));
+                            }
+                          }}
+                          defaultValue=""
+                          className="bg-white border-2 border-black text-[11px] font-bold uppercase px-2 py-1 outline-none cursor-pointer"
+                        >
+                          <option value="" disabled>
+                            MOVER A SPRINT...
+                          </option>
+                          {activeSprints.map((s) => (
+                            <option key={s.id} value={s.id}>
+                              {s.name}
+                            </option>
+                          ))}
+                        </select>
                       )}
                     </td>
                   </tr>

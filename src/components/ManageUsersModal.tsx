@@ -118,25 +118,25 @@ export const ManageUsersModal: React.FC<ManageUsersModalProps> = ({ isOpen, onCl
 
   return (
     <>
-      <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-5xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4 font-mono">
+        <div className="bg-white border-4 border-black brutal-shadow-lg max-w-5xl w-full max-h-[92vh] flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+          <div className="px-6 py-4 border-b-2 border-black bg-yellow-400 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-600/20">
-                <Users className="w-5 h-5" />
+              <div className="w-10 h-10 bg-black text-white flex items-center justify-center border-2 border-black">
+                <Users className="w-5 h-5 stroke-[2.5]" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-base font-bold text-slate-900 leading-tight">
-                    Administración & Edición de Usuarios
+                  <h2 className="text-sm font-black text-black uppercase tracking-wider">
+                    ADMINISTRACIÓN & EDICIÓN DE USUARIOS
                   </h2>
-                  <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-mono font-bold px-2 py-0.5 rounded-md">
-                    {users.length} usuarios
+                  <span className="bg-black text-white text-xs font-black px-2 py-0.5">
+                    {users.length} USUARIOS
                   </span>
                 </div>
-                <p className="text-xs text-slate-500">
-                  Panel de permisos del Project Manager: edita nombres, claves, roles y asignación de proyectos.
+                <p className="text-xs font-bold text-neutral-800 uppercase">
+                  PANEL PROJECT MANAGER: EDITA NOMBRES, CLAVES, ROLES Y ASIGNACIÓN DE PROYECTOS.
                 </p>
               </div>
             </div>
@@ -144,25 +144,25 @@ export const ManageUsersModal: React.FC<ManageUsersModalProps> = ({ isOpen, onCl
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsCsvModalOpen(true)}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-colors shadow-2xs"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase text-black bg-white border-2 border-black brutal-shadow-sm brutal-btn cursor-pointer"
               >
-                <FileSpreadsheet className="w-3.5 h-3.5" />
-                <span>Importar CSV</span>
+                <FileSpreadsheet className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>IMPORTAR CSV</span>
               </button>
 
               <button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-colors shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase text-black bg-orange-500 hover:bg-orange-400 border-2 border-black brutal-shadow-sm brutal-btn cursor-pointer"
               >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span>Nuevo Usuario</span>
+                <UserPlus className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>+ NUEVO USUARIO</span>
               </button>
 
               <button
                 onClick={onClose}
-                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-200/60 transition-colors ml-1"
+                className="text-black hover:bg-neutral-200 border-2 border-black p-1 bg-white cursor-pointer ml-1"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 stroke-[3]" />
               </button>
             </div>
           </div>

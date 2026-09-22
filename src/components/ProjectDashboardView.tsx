@@ -188,62 +188,62 @@ export const ProjectDashboardView: React.FC<ProjectDashboardViewProps> = ({
     <div className="space-y-6">
       {/* Executive Quick KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex items-center justify-between">
+        <div className="bg-white p-4 border-2 border-black brutal-shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Proyectos Activos</p>
-            <p className="text-xl font-bold text-slate-900 mt-0.5">{globalSummary.totalProjects}</p>
+            <p className="text-[10px] font-black uppercase tracking-wider text-neutral-600">PROYECTOS ACTIVOS</p>
+            <p className="text-2xl font-black text-black mt-0.5">{globalSummary.totalProjects}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-            <FolderKanban className="w-5 h-5" />
+          <div className="w-10 h-10 bg-yellow-400 border-2 border-black text-black flex items-center justify-center">
+            <FolderKanban className="w-5 h-5 stroke-[2.5]" />
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex items-center justify-between">
+        <div className="bg-white p-4 border-2 border-black brutal-shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Sprints en Curso</p>
-            <p className="text-xl font-bold text-slate-900 mt-0.5">{globalSummary.totalActiveSprints}</p>
+            <p className="text-[10px] font-black uppercase tracking-wider text-neutral-600">SPRINTS EN CURSO</p>
+            <p className="text-2xl font-black text-black mt-0.5">{globalSummary.totalActiveSprints}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-            <Flame className="w-5 h-5" />
+          <div className="w-10 h-10 bg-orange-400 border-2 border-black text-black flex items-center justify-center">
+            <Flame className="w-5 h-5 stroke-[2.5]" />
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex items-center justify-between">
+        <div className="bg-white p-4 border-2 border-black brutal-shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Tareas Globales</p>
-            <p className="text-xl font-bold text-slate-900 mt-0.5">
+            <p className="text-[10px] font-black uppercase tracking-wider text-neutral-600">TAREAS GLOBALES</p>
+            <p className="text-2xl font-black text-black mt-0.5">
               {globalSummary.doneTasks} / {globalSummary.totalTasks}
             </p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-            <CheckCircle2 className="w-5 h-5" />
+          <div className="w-10 h-10 bg-emerald-400 border-2 border-black text-black flex items-center justify-center">
+            <CheckCircle2 className="w-5 h-5 stroke-[2.5]" />
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex items-center justify-between">
+        <div className="bg-white p-4 border-2 border-black brutal-shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Avance General</p>
-            <p className="text-xl font-bold text-indigo-600 mt-0.5">{globalSummary.globalPercent}%</p>
+            <p className="text-[10px] font-black uppercase tracking-wider text-neutral-600">AVANCE GENERAL</p>
+            <p className="text-2xl font-black text-black mt-0.5">{globalSummary.globalPercent}%</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-            <TrendingUp className="w-5 h-5" />
+          <div className="w-10 h-10 bg-cyan-400 border-2 border-black text-black flex items-center justify-center">
+            <TrendingUp className="w-5 h-5 stroke-[2.5]" />
           </div>
         </div>
       </div>
 
       {/* Main Interactive Master-Detail Dashboard Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start font-mono">
         {/* Left Column: Project Selector List (4 cols) */}
-        <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200 shadow-2xs p-4 flex flex-col space-y-3">
-          <div className="flex items-center justify-between px-1">
+        <div className="lg:col-span-4 bg-white border-2 border-black brutal-shadow-sm p-4 flex flex-col space-y-3">
+          <div className="flex items-center justify-between px-1 border-b-2 border-black pb-2">
             <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-indigo-600" />
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                Seleccionar Proyecto
+              <Layers className="w-4 h-4 text-black stroke-[2.5]" />
+              <h2 className="text-xs font-black uppercase tracking-wider text-black">
+                SELECCIONAR PROYECTO
               </h2>
             </div>
-            <span className="text-[11px] text-slate-400 font-medium">
-              {filteredProjects.length} proyectos
+            <span className="text-[10px] font-black uppercase bg-black text-white px-2 py-0.5">
+              {filteredProjects.length} PROYECTOS
             </span>
           </div>
 

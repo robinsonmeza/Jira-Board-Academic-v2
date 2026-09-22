@@ -67,29 +67,29 @@ export const CreateMemberModal: React.FC<CreateMemberModalProps> = ({ isOpen, on
 
   return (
     <>
-      <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-          <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
-            <div className="flex items-center gap-2 text-slate-900 font-bold text-base tracking-tight">
-              <UserPlus className="w-5 h-5 text-indigo-600" />
-              <span>Crear Usuario Individual</span>
+      <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4 font-mono">
+        <div className="bg-white border-4 border-black brutal-shadow-lg max-w-lg w-full overflow-hidden">
+          <div className="px-6 py-4 border-b-2 border-black flex items-center justify-between bg-yellow-400">
+            <div className="flex items-center gap-2 text-black font-black text-sm uppercase tracking-wider">
+              <UserPlus className="w-5 h-5 stroke-[2.5]" />
+              <span>CREAR USUARIO INDIVIDUAL</span>
             </div>
             <div className="flex items-center gap-2">
               {currentUser?.is_admin && (
                 <button
                   type="button"
                   onClick={() => setIsCsvModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-black uppercase text-black bg-white border-2 border-black brutal-shadow-sm brutal-btn cursor-pointer"
                 >
-                  <FileSpreadsheet className="w-3.5 h-3.5" />
-                  <span>Importar CSV</span>
+                  <FileSpreadsheet className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span>IMPORTAR CSV</span>
                 </button>
               )}
               <button
                 onClick={onClose}
-                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-200/60 transition-colors"
+                className="text-black hover:bg-neutral-200 border-2 border-black p-1 bg-white cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 stroke-[3]" />
               </button>
             </div>
           </div>
@@ -290,21 +290,21 @@ export const MembersModal: React.FC<MembersModalProps> = ({ isOpen, onClose }) =
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-2xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
-          <div className="flex items-center gap-2 text-slate-900 font-bold text-base tracking-tight">
-            <Users className="w-5 h-5 text-indigo-600" />
-            <span>Equipo y Miembros de {currentProject.name}</span>
-            <span className="font-mono text-xs bg-indigo-50 text-indigo-700 border border-indigo-200/80 px-2 py-0.5 rounded-md font-bold">
+    <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4 font-mono">
+      <div className="bg-white border-4 border-black brutal-shadow-lg max-w-2xl w-full overflow-hidden">
+        <div className="px-6 py-4 border-b-2 border-black flex items-center justify-between bg-yellow-400">
+          <div className="flex items-center gap-2 text-black font-black text-sm uppercase tracking-wider">
+            <Users className="w-5 h-5 stroke-[2.5]" />
+            <span>EQUIPO Y MIEMBROS: {currentProject.name}</span>
+            <span className="font-mono text-xs bg-black text-white px-2 py-0.5 font-black">
               {projectMembers.length}
             </span>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-200/60 transition-colors"
+            className="text-black hover:bg-neutral-200 border-2 border-black p-1 bg-white cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 stroke-[3]" />
           </button>
         </div>
 
@@ -472,12 +472,12 @@ export const MembersModal: React.FC<MembersModalProps> = ({ isOpen, onClose }) =
           </div>
         </div>
 
-        <div className="px-6 py-3.5 border-t border-slate-200 bg-slate-50/80 flex justify-end">
+        <div className="px-6 py-3.5 border-t-2 border-black bg-neutral-100 flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl transition-colors shadow-2xs"
+            className="px-5 py-2 bg-black hover:bg-neutral-800 text-white text-xs font-black uppercase border-2 border-black brutal-shadow-sm brutal-btn cursor-pointer"
           >
-            Cerrar
+            CERRAR
           </button>
         </div>
       </div>

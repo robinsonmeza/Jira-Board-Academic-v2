@@ -2,22 +2,76 @@
 
 @layer base {
   * {
-    border-color: var(--color-slate-200);
+    border-color: #000000;
   }
-  
-  /* Custom sleek scrollbars */
+
+  body {
+    background-color: #f1f0ea;
+    color: #0f172a;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace, system-ui;
+  }
+
+  /* Industrial technical grid pattern */
+  .bg-industrial-grid {
+    background-color: #f3f2ec;
+    background-image: 
+      linear-gradient(to right, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .bg-industrial-grid-dark {
+    background-color: #0a0a0c;
+    background-image: 
+      linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Industrial Raw Brutalist box shadows: hard-edge 90-degree offsets */
+  .brutal-shadow {
+    box-shadow: 4px 4px 0px 0px #000000;
+  }
+  .brutal-shadow-sm {
+    box-shadow: 2px 2px 0px 0px #000000;
+  }
+  .brutal-shadow-lg {
+    box-shadow: 6px 6px 0px 0px #000000;
+  }
+  .brutal-shadow-orange {
+    box-shadow: 4px 4px 0px 0px #ea580c;
+  }
+  .brutal-shadow-yellow {
+    box-shadow: 4px 4px 0px 0px #ca8a04;
+  }
+
+  /* Pressable mechanical feedback */
+  .brutal-btn {
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+  .brutal-btn:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0px 0px #000000;
+  }
+  .brutal-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0px 0px #000000;
+  }
+
+  /* Custom mechanical technical scrollbars */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
   ::-webkit-scrollbar-track {
-    background: transparent;
+    background: #e2e1d9;
+    border-left: 2px solid #000000;
+    border-top: 2px solid #000000;
   }
   ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 9999px;
+    background: #000000;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: #ea580c;
   }
 }

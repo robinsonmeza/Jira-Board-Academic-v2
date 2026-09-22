@@ -364,26 +364,26 @@ Felipe Castro,felipe_castro,Dev2026..,Backend,felipe.c@institucion.edu,Grupo 2`;
   );
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-5xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4 font-mono">
+      <div className="bg-white border-4 border-black brutal-shadow-lg max-w-5xl w-full max-h-[92vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
+        <div className="px-6 py-4 border-b-2 border-black flex items-center justify-between bg-yellow-400">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/25">
-              <FileSpreadsheet className="w-5 h-5" />
+            <div className="w-10 h-10 bg-black text-white flex items-center justify-center border-2 border-black">
+              <FileSpreadsheet className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-slate-900 tracking-tight">
-                  Importación Masiva de Usuarios & Asignación de Grupos vía CSV
+                <h2 className="text-sm font-black text-black uppercase tracking-wider">
+                  IMPORTACIÓN MASIVA CSV & ASIGNACIÓN DE GRUPOS
                 </h2>
-                <span className="bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
-                  Exclusivo Project Manager
+                <span className="bg-black text-white text-[10px] font-black px-2 py-0.5 uppercase flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 stroke-[2.5]" />
+                  PROJECT MANAGER
                 </span>
               </div>
-              <p className="text-xs text-slate-500">
-                Carga estudiantes y docentes asignándoles roles y vinculándolos automáticamente a sus respectivos <strong>Grupos / Proyectos</strong>.
+              <p className="text-xs font-bold text-neutral-800 uppercase">
+                CARGA ESTUDIANTES Y DOCENTES CON ROLES Y VINCULACIÓN AUTOMÁTICA A GRUPOS / PROYECTOS.
               </p>
             </div>
           </div>
@@ -391,18 +391,18 @@ Felipe Castro,felipe_castro,Dev2026..,Backend,felipe.c@institucion.edu,Grupo 2`;
           <div className="flex items-center gap-2">
             <button
               onClick={handleDownloadTemplate}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 hover:border-slate-400 text-slate-700 rounded-xl text-xs font-semibold transition-all shadow-2xs hover:bg-slate-50"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border-2 border-black text-black text-xs font-black uppercase brutal-shadow-sm brutal-btn cursor-pointer"
               title="Descargar plantilla de ejemplo con roles y columna Grupo/Proyecto"
             >
-              <Download className="w-3.5 h-3.5 text-indigo-600" />
-              <span>Plantilla CSV con Grupos</span>
+              <Download className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>PLANTILLA CSV</span>
             </button>
 
             <button
               onClick={onClose}
-              className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-200/60 transition-colors"
+              className="text-black hover:bg-neutral-200 border-2 border-black p-1 bg-white cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 stroke-[3]" />
             </button>
           </div>
         </div>

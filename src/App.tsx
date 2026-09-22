@@ -32,7 +32,7 @@ const JiraAppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col">
+    <div className="min-h-screen bg-industrial-grid flex flex-col font-mono text-slate-900 selection:bg-orange-500 selection:text-white">
       <Navbar currentView={currentView} setCurrentView={setCurrentView} />
 
       <main className="flex-1">
@@ -47,10 +47,11 @@ const JiraAppContent: React.FC = () => {
       <div className="fixed bottom-5 left-5 z-30">
         <button
           onClick={() => setShowDocsModal(true)}
-          className="bg-slate-900/90 hover:bg-slate-900 text-white px-3.5 py-2 rounded-full text-xs font-semibold shadow-lg hover:shadow-xl border border-slate-700 flex items-center gap-2 transition-all group backdrop-blur-xs"
+          className="bg-black hover:bg-neutral-900 text-white px-4 py-2 border-2 border-black brutal-shadow brutal-btn text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer"
         >
-          <HelpCircle className="w-4 h-4 text-indigo-400 group-hover:rotate-12 transition-transform" />
-          <span>Matriz de Roles & Guía</span>
+          <span className="w-2 h-2 bg-orange-500 inline-block animate-pulse" />
+          <HelpCircle className="w-4 h-4 text-orange-400" />
+          <span>Matriz de Roles & Guía USB</span>
         </button>
       </div>
 

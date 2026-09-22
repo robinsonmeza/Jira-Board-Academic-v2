@@ -40,7 +40,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
   // Collect all unique labels in this project
   const projectTasks = tasks.filter((t) => t.project_id === currentProject.id);
-  const uniqueLabels = Array.from(new Set(projectTasks.flatMap((t) => t.labels || [])));
+  const uniqueLabels: string[] = Array.from(new Set(projectTasks.flatMap((t) => t.labels || [])));
 
   const hasActiveFilters =
     search.trim() !== '' ||
@@ -58,23 +58,23 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2.5 mb-4 text-xs">
+    <div className="flex flex-wrap items-center gap-2 mb-4 text-xs font-mono">
       {/* Search Input */}
-      <div className="relative min-w-[200px] flex-1 sm:flex-initial">
-        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+      <div className="relative min-w-[220px] flex-1 sm:flex-initial">
+        <Search className="w-3.5 h-3.5 text-black absolute left-3 top-1/2 -translate-y-1/2" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar por título o clave..."
-          className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none shadow-2xs transition-all"
+          placeholder="BUSCAR [CLAVE / TEXTO]..."
+          className="w-full pl-9 pr-8 py-1.5 bg-white border-2 border-black text-xs font-bold uppercase text-black placeholder:text-neutral-400 focus:bg-yellow-100 outline-none brutal-shadow-sm"
         />
         {search && (
           <button
             onClick={() => setSearch('')}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-black hover:text-orange-600 font-black cursor-pointer"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-4 h-4 stroke-[3]" />
           </button>
         )}
       </div>
@@ -83,47 +83,47 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       <select
         value={typeFilter}
         onChange={(e) => setTypeFilter(e.target.value)}
-        className={`px-3 py-1.5 border rounded-xl bg-white outline-none shadow-2xs transition-colors ${
-          typeFilter ? 'border-indigo-500 bg-indigo-50/40 text-indigo-800 font-semibold' : 'border-slate-300 text-slate-700'
+        className={`px-3 py-1.5 border-2 border-black text-xs font-bold uppercase outline-none brutal-shadow-sm cursor-pointer ${
+          typeFilter ? 'bg-orange-500 text-black' : 'bg-white text-black'
         }`}
       >
-        <option value="">Todos los tipos</option>
-        <option value="story">📘 Story</option>
-        <option value="task">☑️ Task</option>
-        <option value="bug">🐞 Bug</option>
-        <option value="epic">⚡ Epic</option>
-        <option value="sub-task">🔗 Sub-task</option>
+        <option value="">TIPO: TODOS</option>
+        <option value="story">📘 STORY</option>
+        <option value="task">☑️ TASK</option>
+        <option value="bug">🐞 BUG</option>
+        <option value="epic">⚡ EPIC</option>
+        <option value="sub-task">🔗 SUB-TASK</option>
       </select>
 
       {/* Priority Filter */}
       <select
         value={priorityFilter}
         onChange={(e) => setPriorityFilter(e.target.value)}
-        className={`px-3 py-1.5 border rounded-xl bg-white outline-none shadow-2xs transition-colors ${
-          priorityFilter ? 'border-indigo-500 bg-indigo-50/40 text-indigo-800 font-semibold' : 'border-slate-300 text-slate-700'
+        className={`px-3 py-1.5 border-2 border-black text-xs font-bold uppercase outline-none brutal-shadow-sm cursor-pointer ${
+          priorityFilter ? 'bg-yellow-400 text-black' : 'bg-white text-black'
         }`}
       >
-        <option value="">Todas las prioridades</option>
-        <option value="highest">🔴 Muy Alta (Highest)</option>
-        <option value="high">🟠 Alta (High)</option>
-        <option value="medium">🟡 Media (Medium)</option>
-        <option value="low">🟢 Baja (Low)</option>
-        <option value="lowest">🔵 Muy Baja (Lowest)</option>
+        <option value="">PRIORIDAD: TODAS</option>
+        <option value="highest">🔴 HIGHEST</option>
+        <option value="high">🟠 HIGH</option>
+        <option value="medium">🟡 MEDIUM</option>
+        <option value="low">🟢 LOW</option>
+        <option value="lowest">🔵 LOWEST</option>
       </select>
 
       {/* Assignee Filter */}
       <select
         value={assigneeFilter}
         onChange={(e) => setAssigneeFilter(e.target.value)}
-        className={`px-3 py-1.5 border rounded-xl bg-white outline-none shadow-2xs transition-colors ${
-          assigneeFilter ? 'border-indigo-500 bg-indigo-50/40 text-indigo-800 font-semibold' : 'border-slate-300 text-slate-700'
+        className={`px-3 py-1.5 border-2 border-black text-xs font-bold uppercase outline-none brutal-shadow-sm cursor-pointer ${
+          assigneeFilter ? 'bg-emerald-400 text-black' : 'bg-white text-black'
         }`}
       >
-        <option value="">Todos los asignados</option>
-        <option value="unassigned">Sin asignar</option>
+        <option value="">ASIGNADO: TODOS</option>
+        <option value="unassigned">SIN ASIGNAR</option>
         {projectUsers.map((u) => (
           <option key={u.id} value={String(u.id)}>
-            {u.name}
+            {u.name.toUpperCase()}
           </option>
         ))}
       </select>
@@ -133,14 +133,14 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <select
           value={labelFilter}
           onChange={(e) => setLabelFilter(e.target.value)}
-          className={`px-3 py-1.5 border rounded-xl bg-white outline-none shadow-2xs transition-colors ${
-            labelFilter ? 'border-indigo-500 bg-indigo-50/40 text-indigo-800 font-semibold' : 'border-slate-300 text-slate-700'
+          className={`px-3 py-1.5 border-2 border-black text-xs font-bold uppercase outline-none brutal-shadow-sm cursor-pointer ${
+            labelFilter ? 'bg-cyan-400 text-black' : 'bg-white text-black'
           }`}
         >
-          <option value="">Todas las etiquetas</option>
+          <option value="">TAG: TODOS</option>
           {uniqueLabels.map((lbl) => (
             <option key={lbl} value={lbl}>
-              🏷️ {lbl}
+              🏷️ {lbl.toUpperCase()}
             </option>
           ))}
         </select>
@@ -150,10 +150,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       {hasActiveFilters && (
         <button
           onClick={clearAllFilters}
-          className="px-2.5 py-1.5 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-xl border border-slate-200 hover:border-rose-200 transition-colors flex items-center gap-1 font-semibold shadow-2xs"
+          className="px-3 py-1.5 bg-rose-500 hover:bg-rose-400 text-white border-2 border-black brutal-shadow-sm brutal-btn text-xs font-black uppercase flex items-center gap-1 cursor-pointer"
         >
-          <X className="w-3.5 h-3.5" />
-          <span>Limpiar Filtros</span>
+          <X className="w-3.5 h-3.5 stroke-[3]" />
+          <span>LIMPIAR FILTROS</span>
         </button>
       )}
     </div>

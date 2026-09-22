@@ -1,238 +1,230 @@
 # Jira Board Clone - Documentación Técnica y Funcional
 
-> **Versión**: 3.3.0  
+> **Versión**: 3.4.0  
 > **Estado**: Producción / Desplegado en Vercel & Firebase Cloud Firestore  
 > **Autor Principal / Project Manager**: Robinson Meza (`RobinsonAmeza@gmail.com`)  
-> **Arquitectura**: Full-stack (React 18 + Vite + Express Backend + Amazon Bedrock + NVIDIA NIM + Google GenAI + Cloud Firestore)
+> **Estilo de Diseño**: Brutalismo Industrial (Industrial Brutalist UI System)  
+> **Arquitectura**: Full-Stack (React 18 + Vite + Tailwind CSS + Node.js/Express + Amazon Bedrock + NVIDIA NIM + Google GenAI + Cloud Firestore)
 
 ---
 
 ## 1. Visión General del Proyecto
 
-**Jira Board Clone** es una plataforma web colaborativa y multiusuario diseñada para la gestión ágil de proyectos de software académico y profesional. Permite planificar Sprints, gestionar Backlogs, administrar tableros Kanban interactivos, registrar métricas y controlar el acceso de usuarios mediante un modelo robusto de control de acceso basado en roles (**RBAC**).
+**Jira Board Clone** es una plataforma web colaborativa y de alto rendimiento diseñada para la gestión ágil de proyectos de software en entornos académicos universitarios y profesionales. Integra tableros Kanban interactivos, planificación y control de Sprints, gestión del Backlog del Producto, métricas ágiles (Burndown Charts, velocidad y distribución), asignación múltiple de desarrolladores, y un modelo estricto de control de acceso basado en roles (**RBAC**).
 
-A partir de la versión **v3.3.0**, la plataforma cuenta con una arquitectura de Inteligencia Artificial resiliente de múltiples niveles que integra **Amazon Bedrock** como proveedor primario de alta velocidad, respaldado por **NVIDIA NIM** como proveedor secundario, **Google Gemini** como contingencia y un **Motor Pedagógico Académico Local** de cero caídas.
+A partir de la versión **v3.4.0**, la plataforma estrena un sistema de diseño visual completo de **Brutalismo Industrial**, maximizando el enfoque técnico, el contraste operativo y la ergonomía visual mediante tipografía monoespaciada, bordes mecánicos sólidos, sombras duras y retroalimentación táctil de alta fidelidad.
+
+Adicionalmente, incorpora un **Tutor Pedagógico Virtual (ScrumBot)** y un **Motor de Calidad de Software (QA)** orquestado en una arquitectura de Inteligencia Artificial resiliente en cuatro niveles (**Amazon Bedrock**, **NVIDIA NIM**, **Google Gemini** y **Motor Local de Cero Caídas**).
 
 ---
 
-## 2. Tutor Académico Virtual con IA (ScrumBot) y Motor de Calidad de Software (v3.3.0)
+## 2. Sistema de Diseño: Brutalismo Industrial (v3.4.0)
 
-### 2.1 Propósito Pedagógico
-En talleres universitarios y cursos de Ingeniería de Software, los estudiantes suelen presentar dudas recurrentes respecto a cómo estructurar historias de usuario, cómo estimar Story Points o cuáles son las responsabilidades según su rol asignado en el proyecto. 
+El nuevo lenguaje visual abandona gradientes decorativos y sombras difusas genéricas en favor de una interfaz de inspiración fabril, técnica y legible:
 
-Para **disminuir la carga del docente y empoderar al estudiante**, se incorporó un tutor pedagógico en tiempo real con IA accesible mediante un botón flotante permanente y contextualizado por proyecto:
+### 2.1 Principios de Diseño
+1. **Alto Contraste y Claridad Estructural**:
+   - Bordes sólidos negros de 2px y 4px (`border-2 border-black`, `border-4 border-black`) que definen con precisión cada bloque, modal y contenedor.
+   - Sombras mecánicas rectangulares sin desenfoque (`box-shadow: 2px 2px 0px #000`, `4px 4px 0px #000`, `6px 6px 0px #000`).
+2. **Tipografía Técnica Monoespaciada**:
+   - Integración global de fuentes monoespaciadas (`font-mono`: JetBrains Mono, Fira Code, Menlo, Courier) para identificadores de tareas (`PRJ-101`), claves, puntos de historia, timestamps y rótulos de estado.
+   - Textos técnicos y etiquetas en mayúsculas de alto impacto visual (`uppercase font-black`).
+3. **Ergonomía Táctil y Micro-interacciones**:
+   - Clase utilitaria `.brutal-btn` con efecto de pulsación mecánica física (`active:translate-x-[2px] active:translate-y-[2px]`).
+   - `.brutal-card` con elevación y transición rígida ante hover.
+4. **Paleta Cromática Funcional**:
+   - **Fondo de Taller / Retícula Técnica**: Patrón `brutal-grid` con fondo claro neutral (`#f8fafc`).
+   - **Amarillo Industrial (`#facc15`)**: Encabezados de módulos, alertas técnicas y fondos de cabecera.
+   - **Naranja de Acción (`#f97316`)**: Botones primarios de guardado, creación y llamadas a la acción críticas.
+   - **Negro Puro (`#000000`)**: Bordes estructurales, texto principal y contrastes clave.
+   - **Esmeralda / Menta (`#10b981` / `#34d399`)**: Estados completados (*Done*), aprobaciones QA y badges de Sprint Activo.
+   - **Cian / Eléctrico (`#38bdf8`)**: Métricas de avance y filtros activos.
 
-1. **Guía para Documentar Historias de Usuario (HU)**:
-   - Enseñanza del estándar canónico:
-     > *"Como [rol], quiero [funcionalidad] para [beneficio]"*.
-   - Redacción de Criterios de Aceptación con enfoque **BDD / Given-When-Then** (*Dado que... Cuando... Entonces...*).
-   - Principios de calidad **INVEST** (Independiente, Negociable, Valiosa, Estimable, Small, Testeable).
-2. **Definiciones y Roles del Equipo**:
-   - Explicación de responsabilidades de **Product Owner**, **Frontend**, **Backend** y **Project Manager**.
-   - Definición de Sprint, Product Backlog, Definition of Done (DoD) y Story Points (serie Fibonacci 1, 2, 3, 5, 8).
-3. **Consciencia del Contexto del Proyecto**:
-   - El bot recibe el nombre del proyecto activo, su clave (`key`), descripción, sprint activo y flujo de columnas del tablero, adaptando sus respuestas a la realidad de cada equipo.
-4. **Inserción Rápida de Plantillas**:
-   - En el modal de creación y edición de tareas, se incluyó el botón **"Insertar Plantilla HU"** para poblar al instante la estructura requerida.
-5. **Chips de Preguntas Frecuentes**:
-   - Acceso en un clic a guías preparadas (BDD, roles, estimación en Fibonacci y contexto del proyecto).
+---
 
-### 2.2 Blindaje Académico (Guardrails Estrictos)
-Para proteger el propósito educativo de la plataforma y evitar desvíos o costos imprevistos:
-- **Blindaje Anti-Desvío de Tema (Strict Guardrails)**:
-  - Instrucción de sistema estricta en el servidor que rechaza automáticamente cualquier solicitud que no pertenezca a Metodologías Ágiles (Scrum/Kanban) o Ingeniería de Software (ej. redacción de poemas, tareas de otras materias, juegos, etc.).
-  - Respuesta estandarizada y cortés: *"Como tutor pedagógico de Scrum y Jira para tu proyecto académico, solo puedo orientarte en temas de metodologías ágiles, historias de usuario, roles de equipo y tareas de este tablero. ¿En qué funcionalidad o historia de tu Sprint podemos avanzar hoy?"*
-- **Protección Anti-Jailbreak / Prompt Injection**: Ignora intentos de "modo DAN", olvido de instrucciones o suplantación de identidad.
-- **Enfoque Pedagógico**: Orienta con contratos de API, escenarios BDD y criterios técnicos, sin hacerle la tarea completa de codificación al estudiante para preservar el aprendizaje.
+## 3. Módulos y Funcionalidades Principales
 
-### 2.3 Arquitectura Multi-Proveedor y Conmutación por Falla (Multi-Tier Resilient Engine)
-El backend orquesta las peticiones a través de 4 niveles jerárquicos para garantizar una disponibilidad continua y libre de interrupciones:
+### 3.1 Tablero Kanban Interactivo (`BoardView.tsx` & `TaskCard.tsx`)
+- **Visualización por Columnas**: Soporte para *To Do*, *In Progress*, *In Review*, *Done* y columnas personalizadas.
+- **Tarjetas de Tarea Brutalistas**:
+  - Código único (`KEY-ID`), tipo de tarea (Historia, Bug, Tarea, Mejora).
+  - Badge de Story Points en cuadrado industrial de color naranja.
+  - Indicador de Prioridad (Crítica, Alta, Media, Baja).
+  - Soporte para **múltiples usuarios asignados simultáneamente** con avatares en mosaico de alto contraste.
+  - Checklist rápido de criterios de aceptación completados (`x/total`).
+  - Botones de transición rápida entre columnas para agilizar el flujo de trabajo.
 
-1. **Tier 1 (PROVEEDOR PRINCIPAL): Amazon Bedrock (Converse API)**
-   - **Autenticación**: Bedrock API Key con autorización vía Bearer Token (`ABSK...`).
-   - **Modelos integrados**: `amazon.nova-lite-v1:0` (ultra-rápido, ~850 ms a 1.6 s), con balanceo interno hacia `amazon.nova-micro-v1:0` y `meta.llama3-70b-instruct-v1:0`.
-   - **Características**: Latencia mínima, alta tasa de tokens por segundo y disponibilidad garantizada en la región `us-east-1`.
-2. **Tier 2 (PROVEEDOR SECUNDARIO): NVIDIA NIM (Inference Microservices)**
-   - **Autenticación**: Clave de API de NVIDIA Cloud (`nvapi-...`).
-   - **Modelo integrado**: `meta/llama-3.2-11b-vision-instruct` (~900 ms de respuesta).
-   - **Características**: Conmutación automática instantánea ante cualquier eventualidad o latencia elevada en el proveedor primario.
-3. **Tier 3 (CONTINGENCIA CLOUD): Google Gemini Cascade**
-   - **Modelos**: `gemini-3.6-flash` y variantes con límite de espera estricto por intento.
-4. **Tier 4 (MOTOR LOCAL DE CERO CAÍDAS): Generador Pedagógico Contextual**
-   - Si se presentase una interrupción externa global simultánea en los proveedores de nube, el servidor genera de manera autónoma dictámenes de auditoría QA, plantillas BDD e instrucciones de Scrum contextualizadas al proyecto actual, asegurando un **tiempo de actividad del 100%**.
+### 3.2 Backlog del Producto y Asignación de Sprints (`BacklogView.tsx`)
+- Tabla técnica completa de tareas pendientes con ordenamiento por prioridad y clave.
+- Mapeo directo y selector rápido de asignación de tareas del Backlog hacia Sprints planificados o activos en un clic.
+- Vista de Story Points totales acumulados en el Backlog.
 
-### 2.4 Endpoints de IA Operativos
+### 3.3 Barra y Gestión de Sprints (`SprintBar.tsx` & `SprintModal.tsx`)
+- Selector desplegable de Sprints con estado en vivo (*Planned*, *Active*, *Completed*).
+- Barra de progreso brutalista que computa porcentaje de puntos completados vs. totales.
+- Fechas de inicio, fin y Objetivo del Sprint (*Sprint Goal*).
+- Controles de inicio de Sprint, cierre (*Complete Sprint*) y creación rápida.
 
-| Endpoint | Método | Propósito | Proveedor Prioritario |
+### 3.4 Dashboard Ejecutivo de Proyectos (`ProjectDashboardView.tsx`)
+- **Panel Maestro-Detalle**: Selector interactivo de proyectos en la columna izquierda y métricas detalladas en la columna principal.
+- **KPIs Globales**: Proyectos activos, Sprints en curso, Tareas completadas y Porcentaje global de avance.
+- **Desglose de Carga de Trabajo**: Distribución de tareas por responsable dentro del equipo, historial de actividad reciente y detalle de cada Sprint.
+
+### 3.5 Reportes y Métricas Ágiles (`ReportsView.tsx`)
+- **Burndown Chart de Sprint**: Línea ideal de quema de Story Points vs. línea de progreso real por día del sprint.
+- **Velocidad de Sprints**: Comparativa de Story Points planificados vs. puntos entregados entre diferentes iteraciones.
+- **Distribución de Trabajo**: Métricas por estado, tipo de incidencia y prioridad.
+
+### 3.6 Modal Integral de Tarea (`TaskModal.tsx`)
+- **Pestañas Técnicas**:
+  1. **Detalles**: Título, descripción técnica con soporte para plantillas canónicas de Historias de Usuario, tipo, prioridad, Story Points, fecha límite y selección multi-asignado.
+  2. **Criterios de Aceptación (BDD)**: Checklist interactivo de escenarios *Given-When-Then* con estados de cumplimiento.
+  3. **Comentarios**: Hilo de discusión en tiempo real con marcas de tiempo relativas y autor.
+  4. **Historial de Actividad**: Auditoría de transiciones de estado, reasignaciones y cambios en la tarea.
+  5. **Archivos Adjuntos**: Soporte para subida y descarga de adjuntos vinculados.
+- **Herramientas de IA Integradas**:
+  - Botón **"Auditar con IA (QA)"**: Ejecuta análisis técnico automático sobre INVEST y BDD.
+  - Botón **"Generar HU con IA"**: Convierte un enunciado breve en una Historia de Usuario canónica estructurada.
+
+### 3.7 Administración de Usuarios e Importación CSV (`ManageUsersModal.tsx` & `CsvImportModal.tsx`)
+- Módulo reservado para el **Project Manager (Admin)**.
+- Creación y edición individual de usuarios con asignación de roles y contraseña.
+- **Importación Masiva vía CSV**:
+  - Descarga de plantilla CSV estandarizada.
+  - Carga masiva de estudiantes y docentes asignándoles rol y **vinculación automática a sus respectivos Grupos/Proyectos**.
+  - Validación de campos requeridos y reporte de errores fila por fila antes de procesar.
+
+---
+
+## 4. Tutor Pedagógico Virtual (ScrumBot) y Motor de Calidad de Software
+
+### 4.1 Propósito Pedagógico
+En cursos universitarios y talleres de desarrollo de software, los estudiantes requieren acompañamiento continuo sobre cómo redactar Historias de Usuario de calidad, estimar tareas con Planning Poker / Fibonacci y entender sus responsabilidades de equipo.
+
+El tutor virtual está disponible de manera permanente mediante un disparador flotante de estilo industrial:
+- **Estructura Canónica de Historias de Usuario**:
+  > *"Como [rol], quiero [funcionalidad] para [beneficio]"*.
+- **Criterios de Aceptación BDD / Given-When-Then**:
+  > *Dado que... Cuando... Entonces...*
+- **Principios INVEST**: Independiente, Negociable, Valiosa, Estimable, Small (Pequeña) y Testeable.
+- **Consciencia de Contexto**: Lee el proyecto activo, su clave, descripción, sprint en curso y columnas para ofrecer respuestas precisas.
+
+### 4.2 Blindaje Académico (Strict Guardrails)
+- **Anti-Desvío de Tema**: Rechazo automático en el servidor de cualquier solicitud ajena a Metodologías Ágiles o Ingeniería de Software.
+- **Anti-Jailbreak**: Blindado frente a intentos de omisión de rol o "modo DAN".
+- **Enfoque Orientador**: Sugiere arquitecturas, contratos de datos y casos de prueba en lugar de resolver la programación llave en mano.
+
+### 4.3 Arquitectura Multi-Nivel de IA (Resiliencia Total)
+El backend (`server.ts`) orquesta las llamadas con conmutación automática (*failover*):
+
+1. **Tier 1 (Principal)**: **Amazon Bedrock (Converse API)**
+   - Modelo: `amazon.nova-lite-v1:0` (latencia ~1.2 s a 1.6 s) con balanceo hacia `amazon.nova-micro-v1:0` y `meta.llama3-70b-instruct-v1:0`.
+2. **Tier 2 (Secundario)**: **NVIDIA NIM**
+   - Modelo: `meta/llama-3.2-11b-vision-instruct` (~900 ms de latencia).
+3. **Tier 3 (Contingencia)**: **Google Gemini**
+   - Modelo: `gemini-3.6-flash` con tiempo de espera estricto por intento.
+4. **Tier 4 (Motor Local de Cero Caídas)**:
+   - Generador pedagógico contextual autónomo que garantiza un **100% de disponibilidad** incluso ante interrupciones de conectividad externa.
+
+---
+
+## 5. Arquitectura de Concurrencia y Persistencia (Firestore)
+
+A partir de la versión 3.0.0, el modelo de datos utiliza colecciones independientes en **Firebase Cloud Firestore**, eliminando condiciones de carrera (*last-write-wins*):
+
+| Colección | Identificador de Documento | Propósito |
+| :--- | :--- | :--- |
+| `tasks` | `taskId` (numérico/string) | Documentos atómicos de tarea (título, estado, sprint, `assignee_ids`). |
+| `projects` | `projectId` | Registro de proyectos, clave única (`key`) y descripción. |
+| `members` | `memberId` | Vinculación de usuarios a proyectos específicos con rol asignado. |
+| `columns` | `columnId` | Columnas del tablero Kanban con orden y límites WIP. |
+| `sprints` | `sprintId` | Sprints planificados, activos y cerrados. |
+| `comments` | `commentId` | Comentarios individuales con autor y fecha. |
+| `activity_logs` | `logId` | Trazabilidad completa de cambios y auditoría. |
+| `users` | `userId` | Cuentas, credenciales seguras, avatar y rol global. |
+| `attachments` | `attachmentId` | Metadatos de archivos adjuntos. |
+
+---
+
+## 6. Matriz de Roles y Permisos (RBAC)
+
+| Rol | Identificador | Alcance | Capacidades Principales |
 | :--- | :--- | :--- | :--- |
-| `/api/ai/chat` | `POST` | Tutor Scrum y asistente de redacción multi-turno | **Amazon Bedrock** (Primario) / **NVIDIA NIM** (Secundario) |
-| `/api/ai/audit-task` | `POST` | Auditoría técnica QA, validación INVEST y formato BDD | **Amazon Bedrock** (Primario) / **NVIDIA NIM** (Secundario) |
-| `/api/ai/generate-story` | `POST` | Conversión automática de requerimiento en Historia de Usuario | **Amazon Bedrock** (Primario) / **NVIDIA NIM** (Secundario) |
+| **Project Manager (Admin)** | `admin` | **Global (Todos los proyectos)** | Control total del sistema: Crear/editar proyectos, administrar usuarios, importación masiva CSV, gestión de columnas, sprints y cualquier tarea. |
+| **Product Owner (Docente / Evaluador)** | `po` | **Global (Todos los proyectos)** | Supervisión y creación de Sprints, redacción y priorización de historias/tareas, auditoría de estimaciones. |
+| **Frontend Developer** | `frontend` | **Proyectos Asignados** | Crear tareas Frontend, mover tarjetas en el tablero, comentar, registrar criterios BDD y adjuntar archivos en tareas asignadas. |
+| **Backend Developer** | `backend` | **Proyectos Asignados** | Crear tareas Backend/API/DB, mover tarjetas en el tablero, comentar, registrar criterios BDD y adjuntar archivos en tareas asignadas. |
 
-### 2.5 Resultados de la Batería de Pruebas de Verificación (100% Superadas)
+---
 
-Se ejecutó una suite automatizada de pruebas exhaustivas en vivo validando la interoperabilidad:
+## 7. Estructura de Archivos del Proyecto
 
 ```text
-=== TEST 1: Amazon Bedrock (PRIMARIA) ===
-Status HTTP: 200 OK | Latencia: 1613 ms
-Resultado: Respuesta pedagógica completa sobre pilares de Scrum (Transparencia, Inspección, Adaptación).
-
-=== TEST 2: NVIDIA NIM (SECUNDARIA) ===
-Status HTTP: 200 OK | Latencia: 1038 ms
-Resultado: Conmutación exitosa y respuesta estructurada sobre principios ágiles.
-
-=== TEST 3: Endpoint Servidor /api/ai/chat (En vivo) ===
-Status HTTP: 200 OK | Latencia: 2922 ms
-Resultado: Explicación interactiva del principio INVEST contextualizada a 'Portal Docente'.
-
-=== TEST 4: Endpoint Servidor /api/ai/audit-task (En vivo) ===
-Status HTTP: 200 OK | Latencia: 5421 ms
-Resultado: Dictamen de calidad técnica y criterios BDD emitidos para la tarea de OAuth 2.0.
-
-=== TEST 5: Endpoint Servidor /api/ai/generate-story (En vivo) ===
-Status HTTP: 200 OK | Latencia: 2621 ms
-Resultado: Generación canónica estructurada con narrativa, BDD, rol y Story Points sugeridos.
-
->>> ¡TODAS LAS PRUEBAS (1 AL 5) SUPERADAS CON ÉXITO! <<<
-```
-
----
-
-## 3. Novedades y Arquitectura de Concurrencia v3.0.0 (Solución de Concurrencia Multi-Estudiante)
-
-### 2.1 Diagnóstico de la Problemática Anterior (v2.5.0)
-En versiones previas, todo el estado de la aplicación se guardaba en un único documento monolítico (`app_state/main`). Cuando dos o más estudiantes trabajaban en el mismo proyecto al mismo tiempo (por ejemplo, el Estudiante A movía una tarea mientras el Estudiante B creaba o editaba otra), la operación `setDoc` de uno sobreescribía todo el documento, borrando los cambios del compañero (condición de carrera o *last-write-wins*).
-
-### 2.2 Arquitectura Granular de Colecciones (Opción A Implementada)
-Para resolver de forma definitiva este problema y permitir alta concurrencia:
-
-1. **Colecciones Granulares en Firestore**:
-   - Cada entidad ahora reside en su propia colección independiente:
-     - `tasks/{taskId}`: Cada tarea se crea, actualiza o mueve como un documento atómico.
-     - `projects/{projectId}`: Proyectos de trabajo.
-     - `members/{memberId}`: Membresías y roles por proyecto.
-     - `columns/{columnId}`: Columnas del tablero Kanban/Scrum.
-     - `sprints/{sprintId}`: Sprints planificados, activos y completados.
-     - `comments/{commentId}`: Comentarios individuales en tareas.
-     - `activity_logs/{logId}`: Registro de auditoría y movimientos.
-     - `users/{userId}`: Cuentas y credenciales de usuario.
-     - `attachments/{attachmentId}`: Archivos adjuntos en tareas.
-
-2. **Cero Conflictos entre Estudiantes**:
-   - Si el Estudiante 1 edita la descripción de la tarea `PRJ-4` y el Estudiante 2 mueve la tarea `PRJ-8` a *In Progress*, Firestore actualiza exclusivamente el documento `tasks/PRJ-4` y `tasks/PRJ-8` respectivamente. **Ningún cambio se pisa ni se elimina**.
-
-3. **Migración Automática e Inicialización Transparente**:
-   - El servicio `firestoreService.ts` inspecciona si las nuevas colecciones ya cuentan con datos. Si no, migra automáticamente los datos existentes desde el documento legacy `app_state/main` o desde las semillas iniciales sin perder ningún proyecto o tarea.
-
-4. **Reactividad Inmediata + Sincronización en Tiempo Real**:
-   - Los componentes reaccionan instantáneamente gracias al estado local reactivo y suscripciones individuales `onSnapshot` por colección.
-
----
-
-## 3. Matriz de Roles y Permisos (RBAC)
-
-La plataforma cuenta con 4 roles definidos:
-
-| Rol | Identificador | Alcance de Proyectos | Permisos Principales |
-| :--- | :--- | :--- | :--- |
-| **Project Manager (Admin)** | `admin` | **Global (Todos los proyectos)** | Control total: Crear/editar/eliminar proyectos, administrar usuarios, importar CSV, gestionar columnas, sprints y cualquier tarea. |
-| **Product Owner (Docente / Evaluador)** | `po` | **Global (Todos los proyectos)** | Supervisión y gestión de sprints, creación y priorización de historias/tareas, estimación de puntos de historia. No puede importar CSV de usuarios. |
-| **Frontend Developer** | `frontend` | **Solo Proyectos Asignados** | Crear tareas de tipo UI/Frontend, mover tarjetas en el tablero, comentar y adjuntar archivos en sus tareas asignadas. |
-| **Backend Developer** | `backend` | **Solo Proyectos Asignados** | Crear tareas de tipo Backend/API/DB, mover tarjetas en el tablero, comentar y adjuntar archivos en sus tareas asignadas. |
-
----
-
-## 4. Estructura de Archivos del Proyecto
-
-```text
-├── firebase-applet-config.json     # Configuración de credenciales de Firebase
-├── firebase-blueprint.json         # Esquema de entidades granulares de Firestore
-├── firestore.rules                 # Reglas de seguridad de Firestore
-├── index.html                      # Punto de entrada HTML
-├── package.json                    # Dependencias del proyecto
+├── firebase-applet-config.json     # Configuración y credenciales de Cloud Firestore
+├── firebase-blueprint.json         # Esquema de entidades granulares
+├── firestore.rules                 # Reglas de seguridad y control de acceso
+├── index.html                      # Documento HTML principal con fuentes monoespaciadas
+├── metadata.json                   # Metadatos del applet y capacidades
+├── package.json                    # Dependencias (React 18, Vite, Lucide, Tailwind)
+├── server.ts                       # Servidor Express Full-Stack con proxies de IA
 ├── src/
-│   ├── App.tsx                     # Enrutador principal y vistas
-│   ├── main.tsx                    # Bootstrap de React
-│   ├── index.css                   # Estilos globales y utilidades Tailwind
+│   ├── App.tsx                     # Enrutador principal y vistas de la app
+│   ├── main.tsx                    # Punto de montaje de React
+│   ├── index.css                   # Utilidades de Brutalismo Industrial (.brutal-*)
 │   ├── types/
-│   │   └── jira.ts                 # Interfaces TypeScript, Roles y Permisos
+│   │   └── jira.ts                 # Interfaces TypeScript, Roles y Permisos RBAC
 │   ├── lib/
-│   │   ├── firebase.ts             # Inicialización de la instancia Firestore
-│   │   └── firestoreService.ts     # CRUD granular, batch operations y migración atómica
+│   │   ├── firebase.ts             # Instancia de Firebase Cloud Firestore
+│   │   └── firestoreService.ts     # CRUD granular y sincronización en tiempo real
 │   ├── data/
-│   │   └── seedData.ts             # Datos semilla iniciales del sistema
+│   │   └── seedData.ts             # Semillas iniciales de proyectos y usuarios
 │   ├── context/
-│   │   └── JiraContext.tsx         # Estado global y suscripciones en tiempo real
+│   │   └── JiraContext.tsx         # Proveedor de estado global y suscripciones onSnapshot
 │   └── components/
-│       ├── Navbar.tsx              # Barra superior, selector de proyecto y perfil
-│       ├── LoginView.tsx           # Pantalla de inicio de sesión segura
-│       ├── KanbanBoard.tsx         # Tablero Kanban interactivo con Drag & Drop
-│       ├── BacklogView.tsx         # Gestión de Backlog y planificación de Sprints
-│       ├── SprintsView.tsx         # Control de Sprints activos y completados
-│       ├── MembersView.tsx         # Gestión de miembros por proyecto
-│       ├── MetricsView.tsx         # Gráficas de rendimiento y velocidad
-│       ├── TaskModal.tsx           # Detalle, edición, comentarios y adjuntos
-│       ├── CreateTaskModal.tsx     # Creación de nuevas tareas
-│       ├── ManageUsersModal.tsx    # Gestión de usuarios e importación CSV
-│       └── CreateProjectModal.tsx  # Creación de nuevos proyectos
+│       ├── AcademicChatbot.tsx     # Tutor pedagógico flotante (ScrumBot con IA)
+│       ├── BacklogView.tsx         # Gestión de Backlog y asignación rápida a Sprints
+│       ├── BoardView.tsx           # Tablero Kanban principal con columnas industriales
+│       ├── CsvImportModal.tsx      # Modal de importación masiva de usuarios CSV
+│       ├── EditUserModal.tsx       # Edición de credenciales y perfiles de usuario
+│       ├── FilterBar.tsx           # Barra de búsqueda y filtros rápidos
+│       ├── LoginView.tsx           # Pantalla de autenticación en Brutalismo Industrial
+│       ├── ManageUsersModal.tsx    # Consola de administración de usuarios (PM)
+│       ├── MemberModals.tsx        # Consulta y gestión de miembros de proyecto
+│       ├── Navbar.tsx              # Barra de navegación técnica superior
+│       ├── ProjectDashboardView.tsx# Dashboard ejecutivo y métricas consolidadas
+│       ├── ProjectModals.tsx       # Modales de creación y edición de proyectos
+│       ├── ProjectsView.tsx        # Vista general de tarjetas de proyectos
+│       ├── ReportsView.tsx         # Gráficas de Burndown, velocidad y distribución
+│       ├── SprintBar.tsx           # Barra de estado y progreso del Sprint activo
+│       ├── SprintModal.tsx         # Modal de planificación y lanzamiento de Sprints
+│       ├── TaskCard.tsx            # Tarjeta de tarea Kanban de alto contraste
+│       └── TaskModal.tsx           # Modal completo de tarea (QA, BDD, comentarios, adjuntos)
 ```
 
 ---
 
-## 5. Modelo de Datos Granular (Firestore Collections)
+## 8. Variables de Entorno y Seguridad
 
-A partir de la versión 3.0.0, Firestore utiliza colecciones independientes:
+Las claves de API nunca se exponen en el frontend. Son administradas exclusivamente por `server.ts`:
 
-- `tasks`: Documentos identificados por `taskId` con propiedades (`title`, `status`, `column_id`, `assignee_ids`, etc.).
-- `projects`: Documentos identificados por `projectId`.
-- `columns`: Documentos identificados por `columnId`.
-- `members`: Documentos identificados por `memberId`.
-- `sprints`: Documentos identificados por `sprintId`.
-- `comments`: Documentos identificados por `commentId`.
-- `activity_logs`: Documentos identificados por `logId`.
-- `users`: Documentos identificados por `userId`.
-- `attachments`: Documentos identificados por `attachmentId`.
+| Variable | Tipo | Proveedor | Propósito |
+| :--- | :--- | :--- | :--- |
+| `BEDROCK_API_KEY` | Secreto | **Amazon Bedrock** | Proveedor primario de IA (Bearer Token) |
+| `NVIDIA_API_KEY` | Secreto | **NVIDIA NIM** | Proveedor secundario de alta disponibilidad |
+| `GEMINI_API_KEY` | Secreto | **Google Cloud** | Proveedor de contingencia para modelos Gemini |
+| `PORT` | Configuración | Servidor Local / Cloud | Puerto de ejecución (por defecto `3000`) |
 
----
-
-## 6. Variables de Entorno y Despliegue
-
-### 6.1 Configuración Segura de Variables de Entorno (Secrets)
-Por motivos estrictos de seguridad y mejores prácticas, las claves secretas y tokens de autenticación **nunca deben commitearse ni exponerse en el repositorio público**. Deben inyectarse mediante el panel de *Settings / Secrets* de la plataforma de hosting o en un archivo `.env` local excluido por `.gitignore`.
-
-| Variable | Tipo | Proveedor | Propósito | Formato Seguro Esperado |
-| :--- | :--- | :--- | :--- | :--- |
-| `BEDROCK_API_KEY` | Secreto (Servidor) | **Amazon Bedrock** | Proveedor primario de IA para chat y QA | `ABSK...[TOKEN_BEARER_DE_LARGA_DURACION]` |
-| `NVIDIA_API_KEY` | Secreto (Servidor) | **NVIDIA NIM** | Proveedor secundario de alta disponibilidad | `nvapi-...[CLAVE_PERSONAL_NVIDIA_CLOUD]` |
-| `GEMINI_API_KEY` | Secreto (Servidor) | **Google Cloud / AI Studio** | Proveedor de contingencia para modelos Gemini | `AIzaSy...[CLAVE_GOOGLE_GENAI]` |
-| `APP_URL` | Configuración | Plataforma | URL canónica para CORS y redirecciones | `https://tu-dominio.run.app` |
-
-> 🔒 **Medidas de Seguridad Implementadas**:
-> - Todas las llamadas a las APIs de IA ocurren **exclusivamente del lado del servidor (`server.ts`)**. Las claves nunca se envían al navegador ni se inyectan en el bundle de frontend (`dist/`).
-> - Las variables de entorno son sanitizadas y cuentan con valores de respaldo controlados sin exponer credenciales en archivos estáticos.
-
-### 6.2 Despliegue en Vercel
-1. El proyecto cuenta con el archivo `vercel.json` configurado para SPA:
-```json
-{
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
-}
-```
-2. Comando de compilación: `npm run build`
-3. Directorio de salida: `dist`
-
-### Despliegue en GitHub
-Para sincronizar las ramas y disparar el despliegue continuo:
+### Comandos de Compilación y Ejecución
 ```bash
-git add .
-git commit -m "feat: Arquitectura granular de colecciones Firestore para soporte multiusuario"
-git push origin main
+# Instalación de dependencias
+npm install
+
+# Servidor de desarrollo con backend integrado
+npm run dev
+
+# Verificación de tipos TypeScript
+npm run lint
+
+# Compilación de producción
+npm run build
 ```
-
----
-
-## 7. Próximos Pasos Sugeridos
-- [ ] Exportación de reportes de Sprint en formato PDF / Excel.
-- [ ] Notificaciones en tiempo real al ser mencionado en comentarios de tareas.
-- [ ] Filtros avanzados por etiquetas y múltiples responsables.
