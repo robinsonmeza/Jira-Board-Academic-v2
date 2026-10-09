@@ -174,10 +174,49 @@ function loadFromStorage<T>(key: string, fallback: T): T {
   }
 }
 
+/**
+ * Ensures strict 1:1 project-to-user membership uniqueness.
+ * Guarantees no user appears twice in the same project.
+ * Extracts any duplicate document IDs so they can be purged from Firestore.
+ */
+export const deduplicateMembersList = (
+  rawMembers: ProjectMember[]
+): { uniqueMembers: ProjectMember[]; duplicateIds: number[] } => {
+  if (!Array.isArray(rawMembers)) return { uniqueMembers: [], duplicateIds: [] };
+
+  const seen = new Set<string>();
+  const uniqueMembers: ProjectMember[] = [];
+  const duplicateIds: number[] = [];
+
+  for (const m of rawMembers) {
+    if (!m || m.project_id === undefined || m.user_id === undefined) continue;
+    const pId = Number(m.project_id);
+    const uId = Number(m.user_id);
+    const key = `${pId}::${uId}`;
+
+    if (seen.has(key)) {
+      duplicateIds.push(Number(m.id));
+    } else {
+      seen.add(key);
+      uniqueMembers.push({
+        ...m,
+        id: Number(m.id),
+        project_id: pId,
+        user_id: uId,
+      });
+    }
+  }
+
+  return { uniqueMembers, duplicateIds };
+};
+
 export const JiraProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [users, setUsers] = useState<User[]>(() => loadFromStorage(STORAGE_KEYS.USERS, INITIAL_USERS));
   const [projects, setProjects] = useState<Project[]>(() => loadFromStorage(STORAGE_KEYS.PROJECTS, INITIAL_PROJECTS));
-  const [members, setMembers] = useState<ProjectMember[]>(() => loadFromStorage(STORAGE_KEYS.MEMBERS, INITIAL_MEMBERS));
+  const [members, setMembers] = useState<ProjectMember[]>(() => {
+    const raw = loadFromStorage(STORAGE_KEYS.MEMBERS, INITIAL_MEMBERS);
+    return deduplicateMembersList(raw).uniqueMembers;
+  });
   const [columns, setColumns] = useState<BoardColumn[]>(() => loadFromStorage(STORAGE_KEYS.COLUMNS, INITIAL_COLUMNS));
   const [tasks, setTasks] = useState<Task[]>(() => loadFromStorage(STORAGE_KEYS.TASKS, INITIAL_TASKS));
   const [sprints, setSprints] = useState<Sprint[]>(() => loadFromStorage(STORAGE_KEYS.SPRINTS, INITIAL_SPRINTS));
@@ -296,8 +335,18 @@ export const JiraProvider: React.FC<{ children: React.ReactNode }> = ({ children
     unsubs.push(
       subscribeToCollection<ProjectMember>(COLLECTIONS.MEMBERS, (items) => {
         if (items && items.length > 0) {
-          setMembers(items);
-          localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(items));
+          const { uniqueMembers, duplicateIds } = deduplicateMembersList(items);
+          setMembers(uniqueMembers);
+          localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(uniqueMembers));
+
+          // Automatically purge any legacy duplicate member documents from Firestore in the background
+          if (duplicateIds.length > 0) {
+            duplicateIds.forEach((dupId) => {
+              deleteMemberDoc(dupId).catch((err) =>
+                console.warn('[Firestore] Auto-cleanup duplicate member error:', dupId, err)
+              );
+            });
+          }
         }
       })
     );
@@ -394,22 +443,29 @@ export const JiraProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (currentUser.is_admin || currentUser.role === 'admin' || currentUser.role === 'po') {
       return projects;
     }
+    const currentUId = Number(currentUser.id);
     const assignedProjectIds = new Set(
-      members.filter((m) => m.user_id === currentUser.id).map((m) => m.project_id)
+      members
+        .filter((m) => Number(m.user_id) === currentUId)
+        .map((m) => Number(m.project_id))
     );
-    return projects.filter((p) => assignedProjectIds.has(p.id));
+    return projects.filter((p) => assignedProjectIds.has(Number(p.id)));
   }, [currentUser, projects, members]);
 
   const currentProject = useMemo(() => {
     if (!currentProjectId) {
       return accessibleProjects[0] || null;
     }
-    const found = projects.find((p) => p.id === currentProjectId);
+    const currProjId = Number(currentProjectId);
+    const found = projects.find((p) => Number(p.id) === currProjId);
     if (!found) return accessibleProjects[0] || null;
     // Check if user has access to it
     const isGlobal = currentUser?.is_admin || currentUser?.role === 'admin' || currentUser?.role === 'po';
     if (isGlobal) return found;
-    const isMember = members.some((m) => m.project_id === found.id && m.user_id === currentUser?.id);
+    const currentUId = currentUser ? Number(currentUser.id) : null;
+    const isMember = members.some(
+      (m) => Number(m.project_id) === Number(found.id) && Number(m.user_id) === currentUId
+    );
     return isMember ? found : accessibleProjects[0] || null;
   }, [projects, currentProjectId, accessibleProjects, currentUser, members]);
 
@@ -419,7 +475,11 @@ export const JiraProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (currentUser.is_admin || currentUser.role === 'admin') return 'admin';
     if (currentUser.role === 'po') return 'po';
     if (!currentProjectId) return currentUser.role || 'frontend';
-    const membership = members.find((m) => m.project_id === currentProjectId && m.user_id === currentUser.id);
+    const currProjId = Number(currentProjectId);
+    const currentUId = Number(currentUser.id);
+    const membership = members.find(
+      (m) => Number(m.project_id) === currProjId && Number(m.user_id) === currentUId
+    );
     if (membership) return membership.role;
     return currentUser.role || 'frontend';
   }, [currentUser, currentProjectId, members]);
@@ -744,8 +804,9 @@ export const JiraProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       // Check if already member
+      const pId = Number(data.project_id);
       const isAlreadyMember = membersRef.current.some(
-        (m) => m.project_id === data.project_id && m.user_id === userId
+        (m) => Number(m.project_id) === pId && Number(m.user_id) === Number(userId)
       );
       if (isAlreadyMember) {
         return { success: false, error: 'El usuario ya es miembro de este proyecto' };
@@ -753,8 +814,8 @@ export const JiraProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const newMember: ProjectMember = {
         id: Date.now() + 1,
-        project_id: data.project_id,
-        user_id: userId,
+        project_id: pId,
+        user_id: Number(userId),
         role: data.role,
         created_at: new Date().toISOString(),
       };
@@ -779,15 +840,19 @@ export const JiraProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!hasPerm('manage_members')) {
         return { success: false, error: 'No tienes permisos para agregar miembros' };
       }
-      const isAlready = membersRef.current.some((m) => m.project_id === projectId && m.user_id === userId);
+      const pId = Number(projectId);
+      const uId = Number(userId);
+      const isAlready = membersRef.current.some(
+        (m) => Number(m.project_id) === pId && Number(m.user_id) === uId
+      );
       if (isAlready) {
         return { success: false, error: 'El usuario ya es miembro de este proyecto' };
       }
 
       const newMember: ProjectMember = {
         id: Date.now(),
-        project_id: projectId,
-        user_id: userId,
+        project_id: pId,
+        user_id: uId,
         role,
         created_at: new Date().toISOString(),
       };
@@ -806,12 +871,13 @@ export const JiraProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateMemberRole = useCallback(
     (memberId: number, role: Role) => {
       if (!hasPerm('manage_members')) return;
-      const updated = membersRef.current.map((m) => (m.id === memberId ? { ...m, role } : m));
+      const mId = Number(memberId);
+      const updated = membersRef.current.map((m) => (Number(m.id) === mId ? { ...m, role } : m));
       setMembers(updated);
       persistState({ members: updated });
 
       // Granular Firestore sync
-      updateMemberPartial(memberId, { role }).catch((err) =>
+      updateMemberPartial(mId, { role }).catch((err) =>
         console.error('[Firestore] Error updating member role:', err)
       );
     },
@@ -821,12 +887,13 @@ export const JiraProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const removeMemberFromProject = useCallback(
     (memberId: number) => {
       if (!hasPerm('manage_members')) return;
-      const updated = membersRef.current.filter((m) => m.id !== memberId);
+      const mId = Number(memberId);
+      const updated = membersRef.current.filter((m) => Number(m.id) !== mId);
       setMembers(updated);
       persistState({ members: updated });
 
       // Granular Firestore deletion
-      deleteMemberDoc(memberId).catch((err) => console.error('[Firestore] Error deleting member:', err));
+      deleteMemberDoc(mId).catch((err) => console.error('[Firestore] Error deleting member:', err));
     },
     [hasPerm, persistState]
   );
@@ -881,35 +948,91 @@ export const JiraProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       let updatedMembers = membersRef.current;
       if (projectIds !== undefined) {
+        const uniqueProjectIds = Array.from(new Set(projectIds.map(Number)));
         const assignedRole: Role = data.role || targetUser.role || (targetUser.is_admin ? 'admin' : 'frontend');
-        const filtered = membersRef.current.filter((m) => m.user_id !== userId);
-        const newEntries: ProjectMember[] = projectIds.map((pId, idx) => ({
-          id: Date.now() + idx + Math.floor(Math.random() * 1000),
-          project_id: pId,
-          user_id: userId,
-          role: assignedRole,
-          created_at: new Date().toISOString(),
-        }));
-        updatedMembers = [...filtered, ...newEntries];
+        const uId = Number(userId);
+
+        // Find existing membership records for this user
+        const existingUserMembers = membersRef.current.filter((m) => Number(m.user_id) === uId);
+
+        const keptMembers: ProjectMember[] = [];
+        const memberIdsToDelete: number[] = [];
+        const handledProjectIds = new Set<number>();
+
+        // 1. Process existing memberships: keep at most one record per unique project
+        for (const em of existingUserMembers) {
+          const emProjId = Number(em.project_id);
+          if (uniqueProjectIds.includes(emProjId) && !handledProjectIds.has(emProjId)) {
+            handledProjectIds.add(emProjId);
+            keptMembers.push({
+              ...em,
+              role: assignedRole,
+            });
+          } else {
+            // Either project is no longer selected, or this was a duplicate entry in Firestore!
+            memberIdsToDelete.push(Number(em.id));
+          }
+        }
+
+        // 2. Add brand-new project memberships that didn't exist before
+        const newMembersToAdd: ProjectMember[] = [];
+        uniqueProjectIds.forEach((pId, idx) => {
+          if (!handledProjectIds.has(pId)) {
+            handledProjectIds.add(pId);
+            newMembersToAdd.push({
+              id: Date.now() + idx + Math.floor(Math.random() * 1000),
+              project_id: pId,
+              user_id: uId,
+              role: assignedRole,
+              created_at: new Date().toISOString(),
+            });
+          }
+        });
+
+        // 3. Assemble complete updated members array
+        const otherMembers = membersRef.current.filter((m) => Number(m.user_id) !== uId);
+        updatedMembers = [...otherMembers, ...keptMembers, ...newMembersToAdd];
+
+        // 4. Firestore Sync: Delete removed / duplicate docs
+        memberIdsToDelete.forEach((delId) => {
+          deleteMemberDoc(delId).catch((err) =>
+            console.error('[Firestore] Error deleting unassigned/duplicate member:', err)
+          );
+        });
+
+        // 5. Firestore Sync: Save newly created member entries
+        newMembersToAdd.forEach((newM) => {
+          saveMember(newM).catch((err) => console.error('[Firestore] Error saving new member:', err));
+        });
+
+        // 6. Firestore Sync: Update role on existing kept member entries
+        keptMembers.forEach((keptM) => {
+          updateMemberPartial(keptM.id, { role: assignedRole }).catch((err) =>
+            console.error('[Firestore] Error updating member role:', err)
+          );
+        });
       } else if (data.role !== undefined) {
+        const uId = Number(userId);
         updatedMembers = membersRef.current.map((m) =>
-          m.user_id === userId ? { ...m, role: data.role as Role } : m
+          Number(m.user_id) === uId ? { ...m, role: data.role as Role } : m
         );
+        updatedMembers
+          .filter((m) => Number(m.user_id) === uId)
+          .forEach((m) => {
+            updateMemberPartial(m.id, { role: data.role as Role }).catch((err) =>
+              console.error('[Firestore] Error updating member role:', err)
+            );
+          });
       }
 
       setUsers(updatedUsers);
       setMembers(updatedMembers);
       persistState({ users: updatedUsers, members: updatedMembers });
 
-      // Granular Firestore sync
+      // Granular Firestore sync for user entity
       const target = updatedUsers.find((u) => u.id === userId);
       if (target) {
         saveUser(target).catch((err) => console.error('[Firestore] Error saving user:', err));
-      }
-      if (projectIds !== undefined) {
-        updatedMembers
-          .filter((m) => m.user_id === userId)
-          .forEach((m) => saveMember(m).catch((err) => console.error('[Firestore] Error saving member:', err)));
       }
 
       return { success: true };
@@ -1055,16 +1178,26 @@ export const JiraProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
         });
 
-        // Add creator / PM as admin member of the new project
+        // Add creator / PM as admin member of the new project if not already present
         if (currentUser) {
-          currentMaxMemberId += 1;
-          newMembersToAdd.push({
-            id: currentMaxMemberId,
-            project_id: newProjId,
-            user_id: currentUser.id,
-            role: 'admin',
-            created_at: new Date().toISOString(),
-          });
+          const cUId = Number(currentUser.id);
+          const already =
+            membersRef.current.some(
+              (m) => Number(m.project_id) === newProjId && Number(m.user_id) === cUId
+            ) ||
+            newMembersToAdd.some(
+              (m) => Number(m.project_id) === newProjId && Number(m.user_id) === cUId
+            );
+          if (!already) {
+            currentMaxMemberId += 1;
+            newMembersToAdd.push({
+              id: currentMaxMemberId,
+              project_id: newProjId,
+              user_id: cUId,
+              role: 'admin',
+              created_at: new Date().toISOString(),
+            });
+          }
         }
 
         return newProjId;
@@ -1103,16 +1236,22 @@ export const JiraProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         if (resolvedProjectId && targetUser) {
+          const rPId = Number(resolvedProjectId);
+          const tUId = Number(targetUser.id);
           const alreadyMember =
-            membersRef.current.some((m) => m.project_id === resolvedProjectId && m.user_id === targetUser?.id) ||
-            newMembersToAdd.some((m) => m.project_id === resolvedProjectId && m.user_id === targetUser?.id);
+            membersRef.current.some(
+              (m) => Number(m.project_id) === rPId && Number(m.user_id) === tUId
+            ) ||
+            newMembersToAdd.some(
+              (m) => Number(m.project_id) === rPId && Number(m.user_id) === tUId
+            );
 
           if (!alreadyMember) {
             currentMaxMemberId += 1;
             newMembersToAdd.push({
               id: currentMaxMemberId,
-              project_id: resolvedProjectId,
-              user_id: targetUser.id,
+              project_id: rPId,
+              user_id: tUId,
               role: item.role,
               created_at: new Date().toISOString(),
             });

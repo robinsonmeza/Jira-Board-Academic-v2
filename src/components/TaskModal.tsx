@@ -75,11 +75,16 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   // Filter users to only those assigned to the current project
   const projectMemberUserIds = useMemo(() => {
     if (!currentProject) return new Set<number>();
-    return new Set(members.filter((m) => m.project_id === currentProject.id).map((m) => m.user_id));
+    const currProjId = Number(currentProject.id);
+    return new Set(
+      members
+        .filter((m) => Number(m.project_id) === currProjId)
+        .map((m) => Number(m.user_id))
+    );
   }, [currentProject, members]);
 
   const projectUsers = useMemo(() => {
-    return users.filter((u) => projectMemberUserIds.has(u.id));
+    return users.filter((u) => projectMemberUserIds.has(Number(u.id)));
   }, [users, projectMemberUserIds]);
 
   // Form State

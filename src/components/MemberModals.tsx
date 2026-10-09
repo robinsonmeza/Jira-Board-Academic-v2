@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useJira } from '../context/JiraContext';
 import {
   X,
@@ -13,7 +13,7 @@ import {
   FileSpreadsheet,
   Pencil,
 } from 'lucide-react';
-import { Role, ROLE_LABELS, ROLE_DESCRIPTIONS, PERMISSIONS, User } from '../types/jira';
+import { Role, ROLE_LABELS, ROLE_DESCRIPTIONS, PERMISSIONS, User, ProjectMember } from '../types/jira';
 import { CsvImportModal } from './CsvImportModal';
 import { EditUserModal } from './EditUserModal';
 
@@ -264,15 +264,35 @@ export const MembersModal: React.FC<MembersModalProps> = ({ isOpen, onClose }) =
 
   if (!isOpen || !currentProject) return null;
 
-  const projectMembers = members
-    .filter((m) => m.project_id === currentProject.id)
-    .map((m) => ({
-      ...m,
-      user: users.find((u) => u.id === m.user_id),
-    }));
+  const projectMembers = useMemo(() => {
+    if (!currentProject) return [];
+    const projId = Number(currentProject.id);
+    const seenUserIds = new Set<number>();
+    const list: Array<ProjectMember & { user?: User }> = [];
 
-  const existingUserIds = new Set(projectMembers.map((m) => m.user_id));
-  const availableUsers = users.filter((u) => !existingUserIds.has(u.id));
+    members
+      .filter((m) => Number(m.project_id) === projId)
+      .forEach((m) => {
+        const uId = Number(m.user_id);
+        if (!seenUserIds.has(uId)) {
+          seenUserIds.add(uId);
+          list.push({
+            ...m,
+            user: users.find((u) => Number(u.id) === uId),
+          });
+        }
+      });
+    return list;
+  }, [currentProject, members, users]);
+
+  const existingUserIds = useMemo(
+    () => new Set(projectMembers.map((m) => Number(m.user_id))),
+    [projectMembers]
+  );
+  const availableUsers = useMemo(
+    () => users.filter((u) => !existingUserIds.has(Number(u.id))),
+    [users, existingUserIds]
+  );
 
   const handleAddMember = (e: React.FormEvent) => {
     e.preventDefault();
@@ -280,8 +300,13 @@ export const MembersModal: React.FC<MembersModalProps> = ({ isOpen, onClose }) =
       setError('Selecciona un usuario existente');
       return;
     }
+    const uId = Number(selectedUserId);
+    if (existingUserIds.has(uId)) {
+      setError('Este usuario ya está asignado a este proyecto');
+      return;
+    }
     setError(null);
-    const res = addMemberToProject(currentProject.id, Number(selectedUserId), selectedRole);
+    const res = addMemberToProject(Number(currentProject.id), uId, selectedRole);
     if (res.success) {
       setSelectedUserId('');
     } else {

@@ -1,7 +1,7 @@
 # Board Academico USB-FI-IS-IS2-V3 - Documentación Técnica y Funcional
 
 > **Subtítulo Oficial**: BOARD DE SIMULACION DE PROYECTOS DE DESARROLLO Y APLICACION DE METODOLGIAS AGILES.  
-> **Versión**: 3.5.0  
+> **Versión**: 3.5.1  
 > **Estado**: Producción / Desplegado en Vercel & Firebase Cloud Firestore  
 > **Autor Principal / Project Manager**: Robinson Meza (`RobinsonAmeza@gmail.com`)  
 > **Estilo de Diseño**: Brutalismo Industrial (Industrial Brutalist UI System)  

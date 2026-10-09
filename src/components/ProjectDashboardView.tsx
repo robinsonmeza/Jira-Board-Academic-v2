@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useJira } from '../context/JiraContext';
-import { Project, ROLE_LABELS, Task, Sprint } from '../types/jira';
+import { Project, ROLE_LABELS, Task, Sprint, ProjectMember } from '../types/jira';
 import {
   FolderKanban,
   Kanban,
@@ -86,7 +86,19 @@ export const ProjectDashboardView: React.FC<ProjectDashboardViewProps> = ({
 
   const projectMembers = useMemo(() => {
     if (!activeProject) return [];
-    return members.filter((m) => m.project_id === activeProject.id);
+    const activeProjId = Number(activeProject.id);
+    const seen = new Set<number>();
+    const list: ProjectMember[] = [];
+    members
+      .filter((m) => Number(m.project_id) === activeProjId)
+      .forEach((m) => {
+        const uId = Number(m.user_id);
+        if (!seen.has(uId)) {
+          seen.add(uId);
+          list.push(m);
+        }
+      });
+    return list;
   }, [members, activeProject]);
 
   const projectSprints = useMemo(() => {
@@ -263,9 +275,10 @@ export const ProjectDashboardView: React.FC<ProjectDashboardViewProps> = ({
           <div className="space-y-2 max-h-[580px] overflow-y-auto pr-1">
             {filteredProjects.map((p) => {
               const isSelected = activeProject?.id === p.id;
-              const pTasks = tasks.filter((t) => t.project_id === p.id);
+              const pTasks = tasks.filter((t) => Number(t.project_id) === Number(p.id));
               const pDone = pTasks.filter((t) => t.status === 'Done');
-              const pMembers = members.filter((m) => m.project_id === p.id);
+              const rawPMembers = members.filter((m) => Number(m.project_id) === Number(p.id));
+              const pMembers = Array.from(new Map(rawPMembers.map((m) => [Number(m.user_id), m])).values());
               const pProgress = pTasks.length > 0 ? Math.round((pDone.length / pTasks.length) * 100) : 0;
               const pActiveSprint = sprints.find((s) => s.project_id === p.id && s.status === 'active');
 

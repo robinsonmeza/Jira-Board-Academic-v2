@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useJira } from '../context/JiraContext';
 import {
   getTaskAssigneeIds,
@@ -28,7 +28,6 @@ import {
   BarChart3,
   CheckCircle2,
   Clock,
-  AlertTriangle,
   Layers,
   Award,
   TrendingUp,
@@ -39,11 +38,13 @@ import {
   Target,
   Search,
   X,
-  Sparkles,
   Bug,
   FolderKanban,
   CheckSquare,
   ArrowRight,
+  ListTodo,
+  Activity,
+  Zap,
 } from 'lucide-react';
 
 interface MetricsViewProps {
@@ -81,70 +82,192 @@ const BrutalTooltip = ({ active, payload, label }: any) => {
 export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => {
   const { currentProject, tasks, columns, sprints, users, members } = useJira();
 
-  // Selected developer filter: 'all' | userId
-  const [selectedDevId, setSelectedDevId] = useState<number | 'all'>('all');
+  // Selected developer filter: 'all' | 'unassigned' | userId
+  const [selectedDevId, setSelectedDevId] = useState<number | 'all' | 'unassigned'>('all');
   const [roleFilter, setRoleFilter] = useState<'all' | 'devs' | 'frontend' | 'backend'>('all');
   const [devSearchQuery, setDevSearchQuery] = useState('');
 
   if (!currentProject) return null;
 
-  // Project tasks, columns and sprints
-  const projectTasks = tasks.filter((t) => t.project_id === currentProject.id);
-  const projectSprints = sprints.filter((s) => s.project_id === currentProject.id);
-  const doneColumn = columns.find((c) => c.project_id === currentProject.id && c.is_done_column);
-  const inProgressColumns = columns.filter(
-    (c) =>
-      c.project_id === currentProject.id &&
-      !c.is_done_column &&
-      c.name.toLowerCase() !== 'to do' &&
-      c.name.toLowerCase() !== 'backlog'
+  // ----------------------------------------------------
+  // Robust Data Filtering by Current Project
+  // Normalizes string/number IDs to prevent type mismatches
+  // ----------------------------------------------------
+  const currentProjId = Number(currentProject.id);
+
+  const projectTasks = useMemo(() => {
+    return tasks.filter((t) => Number(t.project_id) === currentProjId);
+  }, [tasks, currentProjId]);
+
+  const projectColumns = useMemo(() => {
+    return columns
+      .filter((c) => Number(c.project_id) === currentProjId)
+      .sort((a, b) => a.position - b.position);
+  }, [columns, currentProjId]);
+
+  const projectSprints = useMemo(() => {
+    return sprints.filter((s) => Number(s.project_id) === currentProjId);
+  }, [sprints, currentProjId]);
+
+  const projectMembers = useMemo(() => {
+    return members.filter((m) => Number(m.project_id) === currentProjId);
+  }, [members, currentProjId]);
+
+  // ----------------------------------------------------
+  // Task State Helpers (Bulletproof status & column matching)
+  // ----------------------------------------------------
+  const isTaskDone = useCallback(
+    (t: Task): boolean => {
+      if (!t) return false;
+
+      // 1. Check if column_id matches a column marked as done or named like done
+      if (t.column_id !== null && t.column_id !== undefined) {
+        const colIdNum = Number(t.column_id);
+        const col = projectColumns.find((c) => Number(c.id) === colIdNum);
+        if (col) {
+          if (col.is_done_column) return true;
+          const colName = (col.name || '').toLowerCase();
+          if (
+            colName.includes('done') ||
+            colName.includes('completad') ||
+            colName.includes('terminad') ||
+            colName.includes('finaliz') ||
+            colName.includes('listo') ||
+            colName.includes('cerrad')
+          ) {
+            return true;
+          }
+        }
+      }
+
+      // 2. Check task status string
+      const s = String(t.status || '').toLowerCase().trim();
+      return (
+        s === 'done' ||
+        s === 'completado' ||
+        s === 'completada' ||
+        s === 'terminado' ||
+        s === 'terminada' ||
+        s === 'finalizado' ||
+        s === 'finalizada' ||
+        s === 'listo' ||
+        s === 'cerrado' ||
+        s === 'resolved' ||
+        s === 'resuelto'
+      );
+    },
+    [projectColumns]
   );
 
-  // Helper to check if task is completed
-  const isTaskDone = (t: Task) => {
-    if (doneColumn) return t.column_id === doneColumn.id;
-    return t.status.toLowerCase() === 'done' || t.status.toLowerCase() === 'completado';
+  const isTaskInProgress = useCallback(
+    (t: Task): boolean => {
+      if (!t || isTaskDone(t)) return false;
+
+      // Check column
+      if (t.column_id !== null && t.column_id !== undefined) {
+        const colIdNum = Number(t.column_id);
+        const col = projectColumns.find((c) => Number(c.id) === colIdNum);
+        if (col) {
+          const colName = (col.name || '').toLowerCase();
+          if (
+            colName.includes('progress') ||
+            colName.includes('progreso') ||
+            colName.includes('curso') ||
+            colName.includes('review') ||
+            colName.includes('revis') ||
+            colName.includes('qa') ||
+            colName.includes('test') ||
+            colName.includes('desarrollo') ||
+            colName.includes('dev')
+          ) {
+            return true;
+          }
+        }
+      }
+
+      // Check status string
+      const s = String(t.status || '').toLowerCase().trim();
+      return (
+        s.includes('progress') ||
+        s.includes('progreso') ||
+        s.includes('curso') ||
+        s.includes('review') ||
+        s.includes('revis') ||
+        s.includes('qa') ||
+        s.includes('test') ||
+        s.includes('desarrollo')
+      );
+    },
+    [projectColumns, isTaskDone]
+  );
+
+  const isTaskPending = useCallback(
+    (t: Task): boolean => {
+      return !isTaskDone(t) && !isTaskInProgress(t);
+    },
+    [isTaskDone, isTaskInProgress]
+  );
+
+  // Helper to extract story points safely as a number
+  const getTaskPoints = (t: Task): number => {
+    if (t.story_points === null || t.story_points === undefined) return 0;
+    const n = Number(t.story_points);
+    return isNaN(n) ? 0 : n;
   };
 
-  // Helper to check if task is in progress
-  const isTaskInProgress = (t: Task) => {
-    if (inProgressColumns.some((c) => c.id === t.column_id)) return true;
-    const s = t.status.toLowerCase();
-    return s.includes('progress') || s.includes('progreso') || s.includes('review') || s.includes('revisión');
-  };
+  // Helper to get normalized assignee IDs
+  const getAssigneeIds = useCallback((t: Task): number[] => {
+    if (!t) return [];
+    const ids: number[] = [];
+    if (Array.isArray(t.assignee_ids) && t.assignee_ids.length > 0) {
+      t.assignee_ids.forEach((id) => {
+        const n = Number(id);
+        if (!isNaN(n) && n > 0 && !ids.includes(n)) ids.push(n);
+      });
+    }
+    if (t.assignee_id !== null && t.assignee_id !== undefined) {
+      const n = Number(t.assignee_id);
+      if (!isNaN(n) && n > 0 && !ids.includes(n)) ids.push(n);
+    }
+    if (t.assignee && t.assignee.id) {
+      const n = Number(t.assignee.id);
+      if (!isNaN(n) && n > 0 && !ids.includes(n)) ids.push(n);
+    }
+    return ids;
+  }, []);
 
-  // Project developers / members
-  const projectMembers = members.filter((m) => m.project_id === currentProject.id);
-  const projectMemberUserIds = new Set(projectMembers.map((m) => m.user_id));
-
-  // Users who have at least 1 task or are members in this project
+  // ----------------------------------------------------
+  // Developers in Project
+  // ----------------------------------------------------
   const projectDevs: User[] = useMemo(() => {
     const userMap = new Map<number, User>();
 
-    // Add explicit members
+    // 1. Members registered to project
     projectMembers.forEach((m) => {
-      const u = users.find((usr) => usr.id === m.user_id);
-      if (u) userMap.set(u.id, { ...u, role: m.role || u.role });
+      const u = users.find((usr) => Number(usr.id) === Number(m.user_id));
+      if (u) {
+        userMap.set(Number(u.id), { ...u, role: m.role || u.role });
+      }
     });
 
-    // Add any user who has tasks assigned in this project
+    // 2. Users assigned to tasks in this project
     projectTasks.forEach((t) => {
-      const aIds = getTaskAssigneeIds(t);
+      const aIds = getAssigneeIds(t);
       aIds.forEach((uid) => {
         if (!userMap.has(uid)) {
-          const u = users.find((usr) => usr.id === uid);
-          if (u) userMap.set(u.id, u);
+          const u = users.find((usr) => Number(usr.id) === uid);
+          if (u) userMap.set(Number(u.id), u);
         }
       });
     });
 
-    // Also include all developers in users if list is empty for demo richness
+    // Fallback: If no members or assigned tasks, show system developers
     if (userMap.size === 0) {
-      users.forEach((u) => userMap.set(u.id, u));
+      users.forEach((u) => userMap.set(Number(u.id), u));
     }
 
     return Array.from(userMap.values());
-  }, [projectMembers, projectTasks, users]);
+  }, [projectMembers, projectTasks, users, getAssigneeIds]);
 
   // Filter developers by role or search
   const filteredDevs = useMemo(() => {
@@ -172,80 +295,123 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
 
   // Currently selected developer object
   const selectedDev = useMemo(() => {
-    if (selectedDevId === 'all') return null;
-    return projectDevs.find((d) => d.id === selectedDevId) || null;
+    if (typeof selectedDevId !== 'number') return null;
+    return projectDevs.find((d) => Number(d.id) === selectedDevId) || null;
   }, [selectedDevId, projectDevs]);
 
-  // Scoped tasks based on developer filter
+  // Tasks in current scope (either whole project or filtered by developer)
   const scopedTasks = useMemo(() => {
     if (selectedDevId === 'all') {
       return projectTasks;
     }
-    return projectTasks.filter((t) => {
-      const aIds = getTaskAssigneeIds(t);
-      return aIds.includes(selectedDevId);
-    });
-  }, [projectTasks, selectedDevId]);
+    if (selectedDevId === 'unassigned') {
+      return projectTasks.filter((t) => getAssigneeIds(t).length === 0);
+    }
+    const targetDevId = Number(selectedDevId);
+    return projectTasks.filter((t) => getAssigneeIds(t).includes(targetDevId));
+  }, [projectTasks, selectedDevId, getAssigneeIds]);
 
-  // ==========================================
+  // ----------------------------------------------------
   // 1. RECHARTS: AVANCE POR SPRINT
   // Tareas Completadas vs Total de Tareas por Sprint
-  // ==========================================
+  // Guaranteed to plot all tasks without dropping Backlog or active sprints
+  // ----------------------------------------------------
   const sprintProgressData = useMemo(() => {
-    // If there are no sprints in this project, create a default bucket
-    const sprintsToRender = projectSprints.length > 0 ? projectSprints : [
-      { id: 1, name: 'Sprint 1', status: 'completed' } as Sprint,
-      { id: 2, name: 'Sprint 2 (Activo)', status: 'active' } as Sprint,
-    ];
+    const list: Array<{
+      id: number | string;
+      name: string;
+      status: string;
+      totalTasks: number;
+      completedTasks: number;
+      inProgressTasks: number;
+      pendingTasks: number;
+      completionRate: number;
+      totalPoints: number;
+      completedPoints: number;
+      velocityRate: number;
+    }> = [];
 
-    return sprintsToRender.map((sprint) => {
-      // Tasks belonging to this sprint (filtered by dev if selected)
-      const sTasks = scopedTasks.filter((t) => t.sprint_id === sprint.id);
+    // 1. Process all actual project sprints
+    projectSprints.forEach((sprint) => {
+      const sTasks = scopedTasks.filter(
+        (t) => t.sprint_id !== null && Number(t.sprint_id) === Number(sprint.id)
+      );
       const totalTasks = sTasks.length;
       const completedTasks = sTasks.filter(isTaskDone).length;
       const inProgressTasks = sTasks.filter(isTaskInProgress).length;
-      const pendingTasks = Math.max(0, totalTasks - completedTasks - inProgressTasks);
+      const pendingTasks = sTasks.filter(isTaskPending).length;
       const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-      // Story points
-      const totalPoints = sTasks.reduce((acc, t) => acc + (t.story_points || 0), 0);
+      const totalPoints = sTasks.reduce((acc, t) => acc + getTaskPoints(t), 0);
       const completedPoints = sTasks
         .filter(isTaskDone)
-        .reduce((acc, t) => acc + (t.story_points || 0), 0);
+        .reduce((acc, t) => acc + getTaskPoints(t), 0);
+      const velocityRate = totalPoints > 0 ? Math.round((completedPoints / totalPoints) * 100) : 0;
 
-      return {
+      list.push({
         id: sprint.id,
         name: sprint.name,
         status: sprint.status,
         totalTasks,
         completedTasks,
-        pendingTasks,
         inProgressTasks,
+        pendingTasks,
         completionRate,
         totalPoints,
         completedPoints,
-      };
+        velocityRate,
+      });
     });
-  }, [projectSprints, scopedTasks]);
 
-  // Include backlog tasks bucket if there are any
-  const backlogTasks = scopedTasks.filter((t) => !t.sprint_id || t.status.toLowerCase() === 'backlog');
-  const backlogCompleted = backlogTasks.filter(isTaskDone).length;
+    // 2. Check for tasks not assigned to any sprint (Backlog tasks)
+    const unassignedSprintTasks = scopedTasks.filter((t) => {
+      if (t.sprint_id === null || t.sprint_id === undefined || Number(t.sprint_id) === 0) return true;
+      return !projectSprints.some((s) => Number(s.id) === Number(t.sprint_id));
+    });
 
-  // ==========================================
+    if (unassignedSprintTasks.length > 0 || list.length === 0) {
+      const totalTasks = unassignedSprintTasks.length;
+      const completedTasks = unassignedSprintTasks.filter(isTaskDone).length;
+      const inProgressTasks = unassignedSprintTasks.filter(isTaskInProgress).length;
+      const pendingTasks = unassignedSprintTasks.filter(isTaskPending).length;
+      const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+      const totalPoints = unassignedSprintTasks.reduce((acc, t) => acc + getTaskPoints(t), 0);
+      const completedPoints = unassignedSprintTasks
+        .filter(isTaskDone)
+        .reduce((acc, t) => acc + getTaskPoints(t), 0);
+
+      list.push({
+        id: 'backlog',
+        name: list.length === 0 ? 'Tareas del Proyecto' : 'Backlog (Sin Sprint)',
+        status: 'backlog',
+        totalTasks,
+        completedTasks,
+        inProgressTasks,
+        pendingTasks,
+        completionRate,
+        totalPoints,
+        completedPoints,
+        velocityRate: totalPoints > 0 ? Math.round((completedPoints / totalPoints) * 100) : 0,
+      });
+    }
+
+    return list;
+  }, [projectSprints, scopedTasks, isTaskDone, isTaskInProgress, isTaskPending]);
+
+  // ----------------------------------------------------
   // 2. RECHARTS: PRODUCTIVIDAD COMPARATIVA POR DEV
-  // ==========================================
+  // ----------------------------------------------------
   const devsProductivityData = useMemo(() => {
     return projectDevs.map((dev) => {
-      const devTasks = projectTasks.filter((t) => getTaskAssigneeIds(t).includes(dev.id));
+      const devTasks = projectTasks.filter((t) => getAssigneeIds(t).includes(Number(dev.id)));
       const total = devTasks.length;
       const completed = devTasks.filter(isTaskDone).length;
       const inProgress = devTasks.filter(isTaskInProgress).length;
-      const pending = Math.max(0, total - completed - inProgress);
+      const pending = devTasks.filter(isTaskPending).length;
       const pointsDelivered = devTasks
         .filter(isTaskDone)
-        .reduce((acc, t) => acc + (t.story_points || 0), 0);
-      const pointsTotal = devTasks.reduce((acc, t) => acc + (t.story_points || 0), 0);
+        .reduce((acc, t) => acc + getTaskPoints(t), 0);
+      const pointsTotal = devTasks.reduce((acc, t) => acc + getTaskPoints(t), 0);
       const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
 
       return {
@@ -262,30 +428,44 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
         rate,
       };
     });
-  }, [projectDevs, projectTasks]);
+  }, [projectDevs, projectTasks, isTaskDone, isTaskInProgress, isTaskPending, getAssigneeIds]);
 
-  // ==========================================
-  // 3. RECHARTS: DISTRIBUCIÓN POR ESTADO
-  // ==========================================
+  // ----------------------------------------------------
+  // 3. RECHARTS: DISTRIBUCIÓN POR ESTADO (PIPELINE)
+  // ----------------------------------------------------
   const statusDistributionData = useMemo(() => {
     const counts: Record<string, number> = {};
+
+    projectColumns.forEach((col) => {
+      counts[col.name] = 0;
+    });
+
     scopedTasks.forEach((t) => {
-      const col = columns.find((c) => c.id === t.column_id);
-      const colName = col ? col.name : t.status || 'To Do';
+      let colName = '';
+      if (t.column_id !== null && t.column_id !== undefined) {
+        const found = projectColumns.find((c) => Number(c.id) === Number(t.column_id));
+        if (found) colName = found.name;
+      }
+      if (!colName) {
+        colName = t.status || 'To Do';
+      }
       counts[colName] = (counts[colName] || 0) + 1;
     });
 
-    const entries = Object.entries(counts).map(([name, value]) => ({ name, value }));
+    const entries = Object.entries(counts)
+      .filter(([_, value]) => value > 0)
+      .map(([name, value]) => ({ name, value }));
+
     return entries.length > 0 ? entries : [{ name: 'Sin tareas', value: 1 }];
-  }, [scopedTasks, columns]);
+  }, [scopedTasks, projectColumns]);
 
   const STATUS_PIE_COLORS = ['#3b82f6', '#f59e0b', '#8b5cf6', '#10b981', '#ef4444', '#06b6d4'];
 
-  // ==========================================
+  // ----------------------------------------------------
   // 4. RECHARTS: DISTRIBUCIÓN POR TIPO DE TAREA
-  // ==========================================
+  // ----------------------------------------------------
   const typeDistributionData = useMemo(() => {
-    const map: Record<string, { total: number; completed: number }> = {
+    const counts = {
       story: { total: 0, completed: 0 },
       task: { total: 0, completed: 0 },
       bug: { total: 0, completed: 0 },
@@ -294,24 +474,39 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
     };
 
     scopedTasks.forEach((t) => {
-      const typeKey = (t.task_type || 'task').toLowerCase();
-      if (!map[typeKey]) map[typeKey] = { total: 0, completed: 0 };
-      map[typeKey].total += 1;
-      if (isTaskDone(t)) map[typeKey].completed += 1;
+      const rawType = String(t.task_type || (t as any).type || 'task').toLowerCase().trim();
+      let key: keyof typeof counts = 'task';
+
+      if (rawType.includes('stor') || rawType.includes('hist') || rawType === 'hu') {
+        key = 'story';
+      } else if (rawType.includes('bug') || rawType.includes('error') || rawType.includes('defec')) {
+        key = 'bug';
+      } else if (rawType.includes('epic') || rawType.includes('épic')) {
+        key = 'epic';
+      } else if (rawType.includes('sub')) {
+        key = 'sub-task';
+      } else {
+        key = 'task';
+      }
+
+      counts[key].total += 1;
+      if (isTaskDone(t)) {
+        counts[key].completed += 1;
+      }
     });
 
     return [
-      { type: 'Historias (HU)', total: map.story?.total || 0, completadas: map.story?.completed || 0 },
-      { type: 'Tareas Dev', total: map.task?.total || 0, completadas: map.task?.completed || 0 },
-      { type: 'Bugs / QA', total: map.bug?.total || 0, completadas: map.bug?.completed || 0 },
-      { type: 'Epics', total: map.epic?.total || 0, completadas: map.epic?.completed || 0 },
-      { type: 'Sub-Tareas', total: map['sub-task']?.total || 0, completadas: map['sub-task']?.completed || 0 },
+      { type: 'Historias (HU)', total: counts.story.total, completadas: counts.story.completed },
+      { type: 'Tareas Dev', total: counts.task.total, completadas: counts.task.completed },
+      { type: 'Bugs / QA', total: counts.bug.total, completadas: counts.bug.completed },
+      { type: 'Epics', total: counts.epic.total, completadas: counts.epic.completed },
+      { type: 'Sub-Tareas', total: counts['sub-task'].total, completadas: counts['sub-task'].completed },
     ];
-  }, [scopedTasks]);
+  }, [scopedTasks, isTaskDone]);
 
-  // ==========================================
+  // ----------------------------------------------------
   // 5. RECHARTS: DISTRIBUCIÓN POR PRIORIDAD
-  // ==========================================
+  // ----------------------------------------------------
   const priorityDistributionData = useMemo(() => {
     const priorityCounts: Record<string, number> = {
       highest: 0,
@@ -322,10 +517,20 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
     };
 
     scopedTasks.forEach((t) => {
-      const p = (t.priority || 'medium').toLowerCase();
-      if (priorityCounts[p] !== undefined) {
-        priorityCounts[p] += 1;
+      const rawP = String(t.priority || 'medium').toLowerCase().trim();
+      let key = 'medium';
+      if (rawP === 'highest' || rawP.includes('muy alta') || rawP.includes('urgente') || rawP.includes('crit')) {
+        key = 'highest';
+      } else if (rawP === 'high' || rawP.includes('alta')) {
+        key = 'high';
+      } else if (rawP === 'low' || (rawP.includes('baja') && !rawP.includes('muy'))) {
+        key = 'low';
+      } else if (rawP === 'lowest' || rawP.includes('muy baja')) {
+        key = 'lowest';
+      } else {
+        key = 'medium';
       }
+      priorityCounts[key] = (priorityCounts[key] || 0) + 1;
     });
 
     return [
@@ -337,35 +542,36 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
     ];
   }, [scopedTasks]);
 
-  // ==========================================
+  // ----------------------------------------------------
   // 6. TOTALES & KPIS DEL ALCANCE ACTUAL
-  // ==========================================
+  // ----------------------------------------------------
   const totalTasksCount = scopedTasks.length;
   const completedTasksCount = scopedTasks.filter(isTaskDone).length;
   const inProgressTasksCount = scopedTasks.filter(isTaskInProgress).length;
-  const pendingTasksCount = Math.max(0, totalTasksCount - completedTasksCount - inProgressTasksCount);
+  const pendingTasksCount = scopedTasks.filter(isTaskPending).length;
+
   const globalCompletionRate =
     totalTasksCount > 0 ? Math.round((completedTasksCount / totalTasksCount) * 100) : 0;
 
-  const totalPoints = scopedTasks.reduce((acc, t) => acc + (t.story_points || 0), 0);
+  const totalPoints = scopedTasks.reduce((acc, t) => acc + getTaskPoints(t), 0);
   const deliveredPoints = scopedTasks
     .filter(isTaskDone)
-    .reduce((acc, t) => acc + (t.story_points || 0), 0);
+    .reduce((acc, t) => acc + getTaskPoints(t), 0);
 
-  const bugsCount = scopedTasks.filter((t) => t.task_type === 'bug').length;
-  const bugsResolved = scopedTasks.filter((t) => t.task_type === 'bug' && isTaskDone(t)).length;
+  const pointsDeliveryRate =
+    totalPoints > 0 ? Math.round((deliveredPoints / totalPoints) * 100) : 0;
 
-  // Acceptance criteria stats
-  let totalCriteriaCount = 0;
-  let doneCriteriaCount = 0;
-  scopedTasks.forEach((t) => {
-    if (t.acceptance_criteria && Array.isArray(t.acceptance_criteria)) {
-      totalCriteriaCount += t.acceptance_criteria.length;
-      doneCriteriaCount += t.acceptance_criteria.filter((c) => c.done).length;
-    }
-  });
-  const criteriaRate =
-    totalCriteriaCount > 0 ? Math.round((doneCriteriaCount / totalCriteriaCount) * 100) : 0;
+  // Bugs count
+  const isBug = (t: Task) => {
+    const ty = String(t.task_type || (t as any).type || '').toLowerCase();
+    return ty === 'bug' || ty.includes('error') || ty.includes('defec');
+  };
+  const bugsCount = scopedTasks.filter(isBug).length;
+  const bugsResolved = scopedTasks.filter((t) => isBug(t) && isTaskDone(t)).length;
+  const bugsResolutionRate = bugsCount > 0 ? Math.round((bugsResolved / bugsCount) * 100) : 100;
+
+  // Unassigned tasks in current project
+  const unassignedTasksCount = projectTasks.filter((t) => getAssigneeIds(t).length === 0).length;
 
   return (
     <div className="space-y-6 font-mono text-black">
@@ -492,7 +698,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
             {filteredDevs.map((dev) => {
               const isSelected = selectedDevId === dev.id;
               const devTaskCount = projectTasks.filter((t) =>
-                getTaskAssigneeIds(t).includes(dev.id)
+                getAssigneeIds(t).includes(Number(dev.id))
               ).length;
 
               return (
@@ -525,6 +731,21 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
                 </button>
               );
             })}
+
+            {/* Unassigned Filter Option */}
+            {unassignedTasksCount > 0 && (
+              <button
+                onClick={() => setSelectedDevId('unassigned')}
+                className={`px-3 py-2 border-2 text-xs font-black uppercase whitespace-nowrap flex items-center gap-2 shrink-0 transition-all cursor-pointer ${
+                  selectedDevId === 'unassigned'
+                    ? 'bg-neutral-800 text-yellow-300 border-black brutal-shadow brutal-btn'
+                    : 'bg-white text-neutral-700 border-black hover:bg-neutral-100 brutal-shadow-sm'
+                }`}
+              >
+                <span className="text-xs">⚠️</span>
+                <span>SIN ASIGNAR ({unassignedTasksCount})</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -539,7 +760,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
                 {selectedDev.name.charAt(0).toUpperCase()}
               </div>
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-black text-sm uppercase text-black">{selectedDev.name}</span>
                   <span className="bg-black text-white text-[10px] font-black px-2 py-0.5 uppercase">
                     {selectedDev.role ? ROLE_LABELS[selectedDev.role] || selectedDev.role : 'DEVELOPER'}
@@ -547,7 +768,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
                   <span className="text-xs text-neutral-600 font-mono">@{selectedDev.username}</span>
                 </div>
                 <p className="text-xs font-bold text-neutral-700 mt-0.5 uppercase">
-                  VIENDO MÉTRICAS INDIVIDUALES: {completedTasksCount} de {totalTasksCount} tareas completadas ({globalCompletionRate}% de avance) · {deliveredPoints} pts entregados
+                  MÉTRICAS INDIVIDUALES: {completedTasksCount} de {totalTasksCount} tareas completadas ({globalCompletionRate}% avance) · {deliveredPoints} de {totalPoints} story points entregados
                 </p>
               </div>
             </div>
@@ -557,7 +778,20 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
               className="px-3 py-1.5 bg-white border-2 border-black text-black hover:bg-neutral-200 text-xs font-black uppercase brutal-shadow-sm brutal-btn self-start md:self-auto cursor-pointer flex items-center gap-1.5"
             >
               <X className="w-3.5 h-3.5 stroke-[3]" />
-              <span>QUITAR FILTRO DEV</span>
+              <span>VER TODO EL EQUIPO</span>
+            </button>
+          </div>
+        ) : selectedDevId === 'unassigned' ? (
+          <div className="p-2.5 bg-amber-100 border-2 border-black text-xs font-bold text-black uppercase flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <span className="text-base">⚠️</span>
+              VIENDO {scopedTasks.length} TAREAS PENDIENTES DE ASIGNACIÓN EN EL PROYECTO
+            </span>
+            <button
+              onClick={() => setSelectedDevId('all')}
+              className="px-2 py-0.5 bg-black text-white text-[10px] font-black uppercase hover:bg-neutral-800"
+            >
+              VER TODO
             </button>
           </div>
         ) : (
@@ -567,7 +801,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
               VIENDO MÉTRICAS CONSOLIDADAS DE TODO EL EQUIPO EN EL PROYECTO
             </span>
             <span className="text-[10px] bg-black text-white px-2 py-0.5 font-mono font-black">
-              {scopedTasks.length} TAREAS TOTALES
+              {scopedTasks.length} TAREAS EN ALCANCE
             </span>
           </div>
         )}
@@ -625,6 +859,22 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
           </p>
         </div>
 
+        {/* Pending / To Do */}
+        <div className="bg-white p-3.5 border-4 border-black brutal-shadow">
+          <div className="flex items-center justify-between text-black mb-1">
+            <span className="text-[10px] font-black uppercase tracking-wider text-neutral-600">
+              PENDIENTES
+            </span>
+            <div className="p-1 border border-black bg-neutral-200">
+              <ListTodo className="w-3.5 h-3.5 stroke-[2.5]" />
+            </div>
+          </div>
+          <div className="text-2xl font-black text-black tracking-tight">{pendingTasksCount}</div>
+          <p className="text-[9px] font-bold text-neutral-500 uppercase mt-0.5 truncate">
+            POR INICIAR / TO DO
+          </p>
+        </div>
+
         {/* Story Points Delivered */}
         <div className="bg-white p-3.5 border-4 border-black brutal-shadow">
           <div className="flex items-center justify-between text-black mb-1">
@@ -637,7 +887,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
           </div>
           <div className="text-2xl font-black text-black tracking-tight">{deliveredPoints} PTS</div>
           <p className="text-[9px] font-bold text-neutral-500 uppercase mt-0.5 truncate">
-            DE {totalPoints} COMPROMETIDOS
+            DE {totalPoints} PTS ({pointsDeliveryRate}%)
           </p>
         </div>
 
@@ -655,29 +905,13 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
             {bugsResolved} / {bugsCount}
           </div>
           <p className="text-[9px] font-bold text-neutral-500 uppercase mt-0.5 truncate">
-            BUGS RESUELTOS
-          </p>
-        </div>
-
-        {/* BDD Acceptance Criteria */}
-        <div className="bg-white p-3.5 border-4 border-black brutal-shadow">
-          <div className="flex items-center justify-between text-black mb-1">
-            <span className="text-[10px] font-black uppercase tracking-wider text-neutral-600">
-              CRITERIOS BDD
-            </span>
-            <div className="p-1 border border-black bg-yellow-400">
-              <CheckSquare className="w-3.5 h-3.5 stroke-[2.5]" />
-            </div>
-          </div>
-          <div className="text-2xl font-black text-black tracking-tight">{criteriaRate}%</div>
-          <p className="text-[9px] font-bold text-neutral-500 uppercase mt-0.5 truncate">
-            {doneCriteriaCount}/{totalCriteriaCount} CUMPLIDOS
+            {bugsResolutionRate}% RESUELTOS
           </p>
         </div>
       </div>
 
       {/* ---------------------------------------------------- */}
-      {/* 1. GRÁFICO PRINCIPAL DE AVANCE: COMPATATIVA POR SPRINT */}
+      {/* 1. GRÁFICO PRINCIPAL DE AVANCE: COMPARATIVA POR SPRINT */}
       {/* Tareas Completadas vs Total de Tareas por Sprint       */}
       {/* ---------------------------------------------------- */}
       <div className="bg-white p-5 border-4 border-black brutal-shadow space-y-4">
@@ -696,9 +930,9 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
             </p>
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-black">
+          <div className="flex items-center gap-2 text-xs font-black flex-wrap">
             <span className="flex items-center gap-1.5 px-2 py-1 bg-neutral-900 text-white border border-black">
-              <span className="w-2.5 h-2.5 bg-neutral-700 inline-block border border-white" />
+              <span className="w-2.5 h-2.5 bg-neutral-600 inline-block border border-white" />
               TOTAL TAREAS
             </span>
             <span className="flex items-center gap-1.5 px-2 py-1 bg-emerald-400 text-black border border-black">
@@ -713,7 +947,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
         </div>
 
         {/* Recharts ComposedChart (Bar + Line) */}
-        <div className="h-72 w-full">
+        <div className="h-72 w-full min-h-[280px]">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
               data={sprintProgressData}
@@ -751,6 +985,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
                 stroke="#000000"
                 strokeWidth={1.5}
                 radius={[2, 2, 0, 0]}
+                minPointSize={4}
               />
               <Bar
                 yAxisId="left"
@@ -760,6 +995,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
                 stroke="#000000"
                 strokeWidth={1.5}
                 radius={[2, 2, 0, 0]}
+                minPointSize={4}
               />
               <Line
                 yAxisId="right"
@@ -780,7 +1016,9 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
           {sprintProgressData.map((s) => (
             <div key={s.id} className="p-3 bg-neutral-50 border-2 border-black brutal-shadow-sm space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black uppercase truncate text-black">{s.name}</span>
+                <span className="text-xs font-black uppercase truncate text-black" title={s.name}>
+                  {s.name}
+                </span>
                 <span
                   className={`text-[9px] font-black px-1.5 py-0.2 uppercase border border-black ${
                     s.status === 'active'
@@ -837,7 +1075,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
             </span>
           </div>
 
-          <div className="h-64 w-full">
+          <div className="h-64 w-full min-h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={devsProductivityData}
@@ -859,16 +1097,15 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
                 />
                 <Tooltip content={<BrutalTooltip />} />
                 <Legend wrapperStyle={{ fontSize: '11px', fontFamily: 'monospace', fontWeight: 'bold' }} />
-                <Bar dataKey="completed" name="Completadas" fill="#10b981" stackId="a" stroke="#000000" />
-                <Bar dataKey="inProgress" name="En Progreso" fill="#38bdf8" stackId="a" stroke="#000000" />
-                <Bar dataKey="pending" name="Pendientes" fill="#94a3b8" stackId="a" stroke="#000000" />
+                <Bar dataKey="completed" name="Completadas" fill="#10b981" stackId="a" stroke="#000000" minPointSize={2} />
+                <Bar dataKey="inProgress" name="En Progreso" fill="#38bdf8" stackId="a" stroke="#000000" minPointSize={2} />
+                <Bar dataKey="pending" name="Pendientes" fill="#94a3b8" stackId="a" stroke="#000000" minPointSize={2} />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Quick filter click helper */}
           <p className="text-[10px] font-bold text-neutral-500 uppercase italic">
-            * HAZ CLIC EN EL NOMBRE DE UN DESARROLLADOR ARRIBA PARA FILTRAR TODAS LAS MÉTRICAS
+            * HAZ CLIC EN EL BOTÓN DE UN DESARROLLADOR ARRIBA PARA FILTRAR TODAS LAS MÉTRICAS
           </p>
         </div>
 
@@ -885,11 +1122,11 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
               </p>
             </div>
             <span className="text-xs bg-orange-500 text-black px-2 py-0.5 border border-black font-black">
-              {deliveredPoints} PTS TOTALES
+              {deliveredPoints} PTS ENTREGADOS
             </span>
           </div>
 
-          <div className="h-64 w-full">
+          <div className="h-64 w-full min-h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={sprintProgressData}
@@ -914,6 +1151,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
                   fill="#64748b"
                   stroke="#000000"
                   radius={[2, 2, 0, 0]}
+                  minPointSize={3}
                 />
                 <Bar
                   dataKey="completedPoints"
@@ -921,13 +1159,14 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
                   fill="#f59e0b"
                   stroke="#000000"
                   radius={[2, 2, 0, 0]}
+                  minPointSize={3}
                 />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
           <div className="flex items-center justify-between p-2 bg-yellow-100 border-2 border-black text-xs font-black uppercase">
-            <span>VELOCIDAD PROMEDIO:</span>
+            <span>VELOCIDAD MEDIA:</span>
             <span>
               {sprintProgressData.length > 0
                 ? Math.round(
@@ -935,7 +1174,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
                       sprintProgressData.length
                   )
                 : 0}{' '}
-              PTS / SPRINT
+              PTS / CICLO
             </span>
           </div>
         </div>
@@ -957,7 +1196,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
             </p>
           </div>
 
-          <div className="h-48 w-full flex items-center justify-center">
+          <div className="h-48 w-full min-h-[190px] flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -997,7 +1236,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
             </p>
           </div>
 
-          <div className="h-48 w-full">
+          <div className="h-48 w-full min-h-[190px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={typeDistributionData}
@@ -1016,8 +1255,8 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
                 />
                 <Tooltip content={<BrutalTooltip />} />
                 <Legend wrapperStyle={{ fontSize: '10px', fontFamily: 'monospace', fontWeight: 'bold' }} />
-                <Bar dataKey="total" name="Total" fill="#3b82f6" stroke="#000000" />
-                <Bar dataKey="completadas" name="Completadas" fill="#10b981" stroke="#000000" />
+                <Bar dataKey="total" name="Total" fill="#3b82f6" stroke="#000000" minPointSize={3} />
+                <Bar dataKey="completadas" name="Completadas" fill="#10b981" stroke="#000000" minPointSize={3} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -1035,7 +1274,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
             </p>
           </div>
 
-          <div className="h-48 w-full">
+          <div className="h-48 w-full min-h-[190px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={priorityDistributionData}
@@ -1056,7 +1295,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
                   axisLine={{ stroke: '#000000' }}
                 />
                 <Tooltip content={<BrutalTooltip />} />
-                <Bar dataKey="count" name="Tareas" stroke="#000000" strokeWidth={1.5}>
+                <Bar dataKey="count" name="Tareas" stroke="#000000" strokeWidth={1.5} minPointSize={3}>
                   {priorityDistributionData.map((entry, index) => (
                     <Cell key={`prio-cell-${index}`} fill={entry.fill} />
                   ))}
@@ -1100,9 +1339,10 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
               </tr>
             </thead>
             <tbody className="divide-y-2 divide-black border-2 border-black bg-white">
-              {scopedTasks.slice(0, 15).map((task) => {
+              {scopedTasks.slice(0, 20).map((task) => {
                 const isDone = isTaskDone(task);
-                const sprint = projectSprints.find((s) => s.id === task.sprint_id);
+                const isProg = isTaskInProgress(task);
+                const sprint = projectSprints.find((s) => Number(s.id) === Number(task.sprint_id));
 
                 return (
                   <tr
@@ -1120,14 +1360,14 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
                     <td className="p-2.5 uppercase font-bold text-[11px]">
                       <span
                         className={`px-1.5 py-0.5 border border-black ${
-                          task.task_type === 'bug'
+                          isBug(task)
                             ? 'bg-red-500 text-white'
-                            : task.task_type === 'story'
+                            : (task.task_type || '').toLowerCase().includes('stor')
                             ? 'bg-emerald-400 text-black'
                             : 'bg-blue-300 text-black'
                         }`}
                       >
-                        {task.task_type}
+                        {task.task_type || 'task'}
                       </span>
                     </td>
                     <td className="p-2.5 uppercase font-bold text-[11px]">
@@ -1138,7 +1378,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
                             : 'bg-neutral-100 text-black'
                         }`}
                       >
-                        {task.priority}
+                        {task.priority || 'medium'}
                       </span>
                     </td>
                     <td className="p-2.5 uppercase font-bold text-neutral-700 whitespace-nowrap">
@@ -1149,15 +1389,17 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
                         className={`px-2 py-0.5 border border-black text-[11px] uppercase ${
                           isDone
                             ? 'bg-emerald-400 text-black'
+                            : isProg
+                            ? 'bg-cyan-200 text-black'
                             : 'bg-yellow-200 text-black'
                         }`}
                       >
-                        {task.status}
+                        {task.status || (isDone ? 'Done' : 'To Do')}
                       </span>
                     </td>
                     <td className="p-2.5 font-black text-center whitespace-nowrap">
                       <span className="bg-orange-500 text-black px-1.5 py-0.5 border border-black text-[11px]">
-                        {task.story_points ?? 0}
+                        {getTaskPoints(task)}
                       </span>
                     </td>
                     <td className="p-2.5 text-right whitespace-nowrap">
@@ -1178,7 +1420,7 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
               {scopedTasks.length === 0 && (
                 <tr>
                   <td colSpan={8} className="p-6 text-center text-neutral-500 font-bold uppercase">
-                    NO SE ENCONTRARON TAREAS ASIGNADAS AL DESARROLLADOR EN ESTE PROYECTO
+                    NO SE ENCONTRARON TAREAS EN ESTE ALCANCE
                   </td>
                 </tr>
               )}
@@ -1186,9 +1428,9 @@ export const MetricsView: React.FC<MetricsViewProps> = ({ onOpenTaskModal }) => 
           </table>
         </div>
 
-        {scopedTasks.length > 15 && (
+        {scopedTasks.length > 20 && (
           <p className="text-[11px] font-bold text-neutral-500 uppercase text-right">
-            MOSTRANDO 15 DE {scopedTasks.length} TAREAS TOTALES
+            MOSTRANDO 20 DE {scopedTasks.length} TAREAS TOTALES
           </p>
         )}
       </div>

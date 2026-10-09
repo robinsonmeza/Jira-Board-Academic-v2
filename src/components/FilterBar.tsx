@@ -33,10 +33,13 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   if (!currentProject) return null;
 
   // Project members
+  const currProjId = Number(currentProject.id);
   const projectMemberIds = new Set(
-    members.filter((m) => m.project_id === currentProject.id).map((m) => m.user_id)
+    members
+      .filter((m) => Number(m.project_id) === currProjId)
+      .map((m) => Number(m.user_id))
   );
-  const projectUsers = users.filter((u) => projectMemberIds.has(u.id));
+  const projectUsers = users.filter((u) => projectMemberIds.has(Number(u.id)));
 
   // Collect all unique labels in this project
   const projectTasks = tasks.filter((t) => t.project_id === currentProject.id);

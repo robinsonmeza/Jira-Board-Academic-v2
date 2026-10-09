@@ -112,8 +112,13 @@ export const ManageUsersModal: React.FC<ManageUsersModalProps> = ({ isOpen, onCl
     if (isAdmin || userRole === 'admin' || userRole === 'po') {
       return projects.map((p) => p.key);
     }
-    const userProjIds = members.filter((m) => m.user_id === userId).map((m) => m.project_id);
-    return projects.filter((p) => userProjIds.includes(p.id)).map((p) => p.key);
+    const uId = Number(userId);
+    const userProjIds = new Set(
+      members
+        .filter((m) => Number(m.user_id) === uId)
+        .map((m) => Number(m.project_id))
+    );
+    return projects.filter((p) => userProjIds.has(Number(p.id))).map((p) => p.key);
   };
 
   return (

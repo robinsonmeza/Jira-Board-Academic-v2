@@ -357,7 +357,14 @@ export async function batchSaveEntities({
   const ops: Array<{ type: 'set'; ref: any; data: any }> = [];
 
   users.forEach((u) => ops.push({ type: 'set', ref: doc(db, COLLECTIONS.USERS, String(u.id)), data: u }));
-  members.forEach((m) => ops.push({ type: 'set', ref: doc(db, COLLECTIONS.MEMBERS, String(m.id)), data: m }));
+  const seenMemberKey = new Set<string>();
+  members.forEach((m) => {
+    const key = `${Number(m.project_id)}::${Number(m.user_id)}`;
+    if (!seenMemberKey.has(key)) {
+      seenMemberKey.add(key);
+      ops.push({ type: 'set', ref: doc(db, COLLECTIONS.MEMBERS, String(m.id)), data: m });
+    }
+  });
   projects.forEach((p) => ops.push({ type: 'set', ref: doc(db, COLLECTIONS.PROJECTS, String(p.id)), data: p }));
   columns.forEach((c) => ops.push({ type: 'set', ref: doc(db, COLLECTIONS.COLUMNS, String(c.id)), data: c }));
 

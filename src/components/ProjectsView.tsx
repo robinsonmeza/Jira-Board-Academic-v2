@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useJira } from '../context/JiraContext';
-import { Project, ROLE_LABELS } from '../types/jira';
+import { Project, ROLE_LABELS, ProjectMember } from '../types/jira';
 import {
   FolderKanban,
   Plus,
@@ -223,8 +223,11 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenBoard }) => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProjects.map((project) => {
-              const projectTasks = tasks.filter((t) => t.project_id === project.id);
-              const projectMembers = members.filter((m) => m.project_id === project.id);
+              const projectTasks = tasks.filter((t) => Number(t.project_id) === Number(project.id));
+              const rawProjectMembers = members.filter((m) => Number(m.project_id) === Number(project.id));
+              const projectMembers: ProjectMember[] = Array.from(
+                new Map<number, ProjectMember>(rawProjectMembers.map((m) => [Number(m.user_id), m])).values()
+              );
               const doneTasks = projectTasks.filter((t) => t.status === 'Done');
               const progress = projectTasks.length ? Math.round((doneTasks.length / projectTasks.length) * 100) : 0;
 

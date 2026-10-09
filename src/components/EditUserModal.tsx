@@ -80,9 +80,13 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
       setRole(user.role || (user.is_admin ? 'admin' : 'frontend'));
       setAvatarColor(user.avatar_color || '#4A90D9');
 
-      const userProjects = members
-        .filter((m) => m.user_id === user.id)
-        .map((m) => m.project_id);
+      const userProjects = Array.from(
+        new Set(
+          members
+            .filter((m) => Number(m.user_id) === Number(user.id))
+            .map((m) => Number(m.project_id))
+        )
+      );
       setSelectedProjectIds(userProjects);
 
       setError(null);
@@ -98,8 +102,9 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
   const isOnlyAdmin = (user.is_admin || user.role === 'admin') && adminCount <= 1;
 
   const handleToggleProject = (pId: number) => {
+    const numId = Number(pId);
     setSelectedProjectIds((prev) =>
-      prev.includes(pId) ? prev.filter((id) => id !== pId) : [...prev, pId]
+      prev.includes(numId) ? prev.filter((id) => id !== numId) : [...prev, numId]
     );
   };
 
@@ -142,7 +147,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
         role,
         avatar_color: avatarColor,
       },
-      selectedProjectIds
+      Array.from(new Set(selectedProjectIds.map(Number)))
     );
 
     if (res.success) {

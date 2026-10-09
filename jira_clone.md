@@ -1,7 +1,7 @@
 # Board Academico USB-FI-IS-IS2-V3 - Resumen Técnico y Guía Rápida
 
 > **Subtítulo Oficial**: BOARD DE SIMULACION DE PROYECTOS DE DESARROLLO Y APLICACION DE METODOLGIAS AGILES.  
-> **Versión**: 3.5.0  
+> **Versión**: 3.5.1  
 > **Estado**: Producción / Desplegado en Vercel & Firebase Cloud Firestore  
 > **Autor Principal / Project Manager**: Robinson Meza (`RobinsonAmeza@gmail.com`)  
 > **Estilo de Diseño**: Brutalismo Industrial (Industrial Brutalist UI System)  
@@ -9,9 +9,22 @@
 
 ---
 
-## 1. Novedades de la Versión 3.5.0
+## 1. Novedades de la Versión 3.5.1
 
-1. **Ceremonias Ágiles Integradas en Cada Proyecto**:
+1. **Auditoría y Corrección Integral del Módulo de Métricas (`MetricsView.tsx`)**:
+   - **Corrección de Detección de Estado Terminado (`isTaskDone`)**:
+     - Resuelto el desajuste de tipos (string vs number) y nombres de columnas personalizadas.
+     - Ahora verifica exhaustivamente tanto si la tarea pertenece a una columna marcada como terminada (`is_done_column` o nombres canónicos: 'Done', 'Terminado', 'Completado', 'Finalizado', 'Listo') como los valores del campo `status`.
+   - **Gráfico de Avance por Sprint Sin Tareas Huérfanas**:
+     - El gráfico de avance por Sprint ahora mapea los sprints reales del proyecto y agrega automáticamente el bucket `Backlog (Sin Sprint)` o `Tareas del Proyecto` para asegurar que el 100% de las tareas creadas estén representadas en las barras y curvas de efectividad.
+   - **Cálculo Numérico Estricto de Story Points**:
+     - Parseo defensivo a valor numérico para prevenir concatenación de cadenas (`"035"` vs `8`) que rompía las escalas de Recharts.
+   - **Normalización de Asignaciones de Desarrolladores**:
+     - Normalización numérica de `assignee_id` y `assignee_ids` para que el filtrado por desarrollador compute con precisión del 100% las tareas completadas, en progreso y pendientes de cada miembro.
+   - **Reemplazo de Métricas Huérfanas por KPIs Reales**:
+     - Se reemplazó el indicador estático por 6 métricas 100% medibles y calculadas en tiempo real: *Total Tareas*, *Completadas con % de Efectividad*, *En Progreso*, *Pendientes / To Do*, *Story Points Comprometidos vs Entregados*, y *Bugs Resueltos con % de Calidad*.
+
+2. **Ceremonias Ágiles Integradas en Cada Proyecto**:
    - **Daily Scrum Standup (`DailyScrumModal.tsx`)**:
      - Inspirado en la dinámica ergonómica de *DailyToast.io*.
      - Carga automática de los integrantes vinculados al proyecto actual.
